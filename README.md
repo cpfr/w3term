@@ -5,6 +5,8 @@ Javascript Web Terminal
 -----------------------
 This terminal is intended to support the emulation of an interactive shell like many scripting languages or the operating systems themselves provide. 
 
+[Live Demo](http://htmlpreview.github.io/?https://github.com/tuschcarsten/w3term/blob/master/index.html)
+
 Features
 --------
 - Text input
