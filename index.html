@@ -1,0 +1,235 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Monty - Terminal Test</title>
+    <link rel="stylesheet" href="terminal.css" type="text/css"/>
+    <!-- <script src="jquery.js"></script> -->
+    <script
+        src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+    <script src="terminal.js"></script>
+  </head>
+  <body>
+    <h1>w3term - Javascript Terminal</h1>
+    <p>
+    This terminal is intended to support the emulation of an interactive shell
+    like many scripting languages or the operating systems themselves provide.
+    </p>
+
+    <div id="foo"></div>
+
+    <h3>Features</h3>
+    <ul>
+        <li>Text input</li>
+        <li>Paste text using CTRL+V</li>
+        <li>TAB indents 4 spaces</li>
+        <li>SHIFT+TAB dedents up to 4 spaces</li>
+        <li>HOME / END jump to start / end of line</li>
+        <li>Navigation using arrow keys</li>
+        <li>
+            Quick navigation between words using
+            CTRL+LEFT / CTRL*RIGHT
+        </li>
+        <li>
+            Browsing through command history using UP and DOWN keys
+        </li>
+        <li>Commiting commands using RETURN</li>
+        <li>
+            Bind a callback function which evaluates the commands and implements
+            behavior.
+        </li>
+        <li>Compatible with non-keyboard devices</li>
+    </ul>
+
+    <h3>Requirements</h3>
+    <ul>
+        <li>Requires JQuery</li>
+    </ul>
+
+    <h3>TODO:</h3>
+    <ul>
+        <li>Testing in IE</li>
+    </ul>
+    <h3>Tested in:</h3>
+    <ul>
+        <li>Firefox 33.0</li>
+        <li>Chromium 37.0</li>
+        <li>Chrome 18.0</li>
+        <li>Opera 12.16</li>
+        <li>Android 4.04 Browser</li>
+    </ul>
+
+    <h1>Documentation</h1>
+    <h2>Method Summary</h2>
+    <ul>
+        <li>
+            <code>terminal.init(element, options)</code><br/>
+            Replaces the given element with a terminal.
+            <ul>
+                <li>
+                    <code>element</code><br/>
+                    An element or a selector for the element which should be
+                    converted into a terminal.
+                </li>
+                <li>
+                    <code>options</code> [optional]<br/>
+                    A Javascript object which defines the behavior of the
+                    terminal. Possible values are:
+                    <ul>
+                        <li>
+                            <code>prompt</code>:
+                            (string) The prompt symbol
+                            <i>(default=<code>"&gt; "</code>)</i>
+                        </li>
+                        <li>
+                            <code>historySize</code>:
+                            (int) The number of commands which can be stored
+                            within the command history.
+                            <i>(default=<code>100</code>)</i>
+                        </li>
+                        <li>
+                            <code>processCommand</code>:
+                            (function(cmd, term)) A handler function which
+                            receives a command from the terminal and may
+                            process them. The second parameter is optional
+                            and will receive the terminal object which sent
+                            the command.
+                            <i>
+                                (writes the command to the JS console
+                                by default)
+                            </i>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+        </li>
+        <li>
+            <code>terminal.setInput(_terminal, text)</code><br/>
+            Sets the prompt line of the given terminal to the given text.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+                <li>
+                    <code>text</code><br/>
+                    The text which should be set as current line
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.clear(_terminal)</code><br/>
+            Clears the contents of the given terminal.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.print(_terminal, text)</code><br/>
+            Prints a line of text into the given terminal.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+                <li>
+                    <code>text</code><br/>
+                    The text which should be printed
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.setOptionsDefault(_terminal)</code><br/>
+            Sets the terminal options to default.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.setOptions(_terminal, options)</code><br/>
+            Sets the terminal options to the given options.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+                <li>
+                    <code>options</code><br/>
+                    A Javascript object which defines the behavior of the
+                    terminal. Possible values are:
+                    <ul>
+                        <li>
+                            <code>prompt</code>:
+                            (string) The prompt symbol
+                            <i>(default=<code>"&gt; "</code>)</i>
+                        </li>
+                        <li>
+                            <code>historySize</code>:
+                            (int) The number of commands which can be stored
+                            within the command history.
+                            <i>(default=<code>100</code>)</i>
+                        </li>
+                        <li>
+                            <code>processCommand</code>:
+                            (function(cmd, term)) A handler function which
+                            receives a command from the terminal and may
+                            process them. The second parameter is optional
+                            and will receive the terminal object which sent
+                            the command.
+                            <i>
+                                (writes the command to the JS console
+                                by default)
+                            </i>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <!--<li>
+            <code>terminal.</code><br/>
+        </li>-->
+    </ul>
+  </body>
+
+  <script type="application/javascript">
+    $(document).ready(function(){
+            var term = terminal.init('#foo',
+            {
+                prompt : '$ ',
+                historySize : 4,
+                processCommand : function(cmd, term){
+                    if(cmd == "clear"){
+                        terminal.clear(term);
+                    }
+                    else if(cmd == 'help'){
+                        terminal.print(term,
+                                       "This terminal contains no help files!");
+                    }
+                    else if(cmd == 'input'){
+                        terminal.setInput(term, "clear");
+                    }
+                    else if(cmd.substr(0,6) == 'prompt'){
+                        var sym = cmd.split(' ');
+                        sym = sym[sym.length-1];
+                        terminal.setOptions(term, {prompt : sym});
+                    }
+                    else if(cmd.substr(0,6) == 'foo'){
+                        terminal.setOptions(term, {historySize : 2});
+                    }
+                    else {
+                        console.log('cmd: "'+cmd+'"');
+                    }
+                }
+            });
+        }
+    );
+  </script>
+
+</html>
