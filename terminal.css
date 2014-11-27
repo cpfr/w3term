@@ -28,7 +28,8 @@ code {
     position: absolute;
     background-color: transparent;
     outline: none;
-    border: none; }
+    border: none;
+    font-size: 0; }
   .terminal .currentLine {
     outline: none;
     border: none; }

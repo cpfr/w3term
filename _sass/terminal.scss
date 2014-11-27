@@ -39,6 +39,7 @@ code
         background-color: transparent;
         outline: none;
         border: none;
+        font-size: 0;
     }
 
 
@@ -59,7 +60,7 @@ code
         margin: 0;
         color: $terminalInactiveColor;
     }
-    
+
     .output
     {
         color: $terminalOutputColor;

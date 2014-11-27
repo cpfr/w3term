@@ -25,10 +25,6 @@ Requirements
 ------------
 - Requires JQuery
 
-TODO:
------
-- Testing in IE
-
 Tested in:
 ----------
 - Firefox 33.0
@@ -36,6 +32,7 @@ Tested in:
 - Chrome 18.0
 - Opera 12.16
 - Android 4.04 Browser
+- Internet Explorer 11.0.14
 
 
 Documentation
