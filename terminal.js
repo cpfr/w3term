@@ -21,7 +21,7 @@ var terminal =
         var _prompt = $('<span class="prompt">'
                         +_terminal.data('options').prompt+'</span>');
         var _prev = $('<span></span>');
-        var _caret = $('<span class="caret blink end"> </span>');
+        var _caret = $('<span class="textcursor blink end"> </span>');
         var _next = $('<span></span>');
 
         _currentLine.append(_prompt).append(_prev).append(_caret).append(_next);

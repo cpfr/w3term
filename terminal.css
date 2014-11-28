@@ -41,7 +41,7 @@ code {
     color: #559933; }
   .terminal .output {
     color: #666666; }
-  .terminal .caret {
+  .terminal .textcursor {
     background-color: #99ff66;
     color: black;
     white-space: pre; }
