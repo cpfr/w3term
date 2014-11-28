@@ -3,21 +3,6 @@ $terminalColor: #99FF66;
 $terminalInactiveColor: darken(desaturate($terminalColor, 50%), 30%);
 $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
 
-body{
-    max-width: 600px;
-    margin: 1em auto;
-    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
-    background-color: #333;
-    color: #ffffff;
-    text-align: justify;
-}
-
-code
-{
-    font-family: monospace;
-    color: $terminalInactiveColor;
-    font-style: normal;
-}
 
 .terminal
 {
