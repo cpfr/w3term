@@ -16,7 +16,7 @@ var terminal =
         terminal.setOptionsDefault(_terminal);
         terminal.setOptions(_terminal, options);
 
-        var _hiddenInput = $('<input class="hidden"/>');
+        var _hiddenInput = $('<input type="text" class="hiddenInput"/>');
         var _currentLine = $('<span class="currentLine" tabindex="0"></span>');
         var _prompt = $('<span class="prompt">'
                         +_terminal.data('options').prompt+'</span>');
