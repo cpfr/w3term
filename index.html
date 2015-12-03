@@ -22,7 +22,6 @@
     code
     {
         font-family: monospace;
-        color: $terminalInactiveColor;
         font-style: normal;
     }
     </style>
@@ -242,6 +241,39 @@
                     else if(cmd == 'help'){
                         terminal.print(term,
                                        "This terminal does not contain any help files!");
+                    }
+                    else if(cmd == 'colors'){
+                        terminal.print(term,
+                       "This terminal supports different colors and font styles\n"
+                        +"according to the ANSI escape codes:\n"
+                        + " - \x1B[31mred\x1B[0m color\n"
+                        + " - \x1B[32mgreen\x1B[0m color\n"
+                        + " - \x1B[33myellow\x1B[0m color\n"
+                        + " - \x1B[34mblue\x1B[0m color\n"
+                        + " - \x1B[35mmagenta\x1B[0m color\n"
+                        + " - \x1B[36mcyan\x1B[0m color\n"
+                        + " - \x1B[37mwhite\x1B[0m color\n"
+                        + " - \x1B[41mred\x1B[0m background\n"
+                        + " - \x1B[42mgreen\x1B[0m background\n"
+                        + " - \x1B[43myellow\x1B[0m background\n"
+                        + " - \x1B[44mblue\x1B[0m background\n"
+                        + " - \x1B[45mmagenta\x1B[0m background\n"
+                        + " - \x1B[46mcyan\x1B[0m background\n"
+                        + " - \x1B[47mwhite\x1B[0m background\n"
+                        + " - \x1B[1mbold\x1B[0m font\n"
+                        + " - \x1B[3mitalic\x1B[0m font\n"
+                        + " - \x1B[4munderlined\x1B[0m font\n"
+                        + " - \x1B[5mblinking\x1B[0m font\n"
+                        + " - \x1B[7minverted\x1B[0m font\n"
+                        + " - \x1B[92msuccess\x1B[0m highlighting\n"
+                        + " - \x1B[95mheader\x1B[0m highlighting\n"
+                        + " - \x1B[94minfo\x1B[0m highlighting\n"
+                        + " - \x1B[93mwarning\x1B[0m highlighting\n"
+                        + " - \x1B[91merror\x1B[0m highlighting\n"
+                        + "\n"
+                        + "And this works also with "
+                        + "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m"
+                       );
                     }
 //                     else if(cmd == 'cls'){
 //                         terminal.setInput(term, "clear");

@@ -56,3 +56,16 @@
   100% {
     background-color: #99ff66;
     color: black; } }
+.term-textblink {
+  animation: term-textblink 1s steps(5, start) infinite;
+  -webkit-animation: term-textblink 1s steps(5, start) infinite; }
+
+@keyframes term-textblink {
+  to {
+    visibility: hidden; } }
+@-webkit-keyframes term-textblink {
+  to {
+    visibility: hidden; } }
+.term-textinverted {
+  color: black;
+  background-color: #666666; }

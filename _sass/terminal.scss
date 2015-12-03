@@ -93,3 +93,25 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         color: $terminalBackgroundColor;
     }
 }
+
+
+
+.term-textblink {
+    animation: term-textblink 1s steps(5, start) infinite;
+    -webkit-animation: term-textblink 1s steps(5, start) infinite;
+}
+@keyframes term-textblink {
+    to {
+        visibility: hidden;
+    }
+}
+@-webkit-keyframes term-textblink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.term-textinverted{
+    color: $terminalBackgroundColor;
+    background-color: $terminalOutputColor;
+}

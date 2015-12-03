@@ -1,3 +1,8 @@
+String.prototype.repeat = function( num )
+{
+    return new Array( num + 1 ).join( this );
+}
+
 var terminal =
 {
     // initialize a terminal which replaces the given element
@@ -312,7 +317,120 @@ var terminal =
     // print text to the terminal
     print : function(_terminal, text){
         var _currentLine = _terminal.data('currentLine');
+        text = this._processColors(text);
         _currentLine.before('<p class="output">'+text+'<p>');
+    },
+
+    _processColors : function(text){
+        var tagCount = 0;
+        // text = text.replace("\x1B[31m", "<span style=\"color: red;\">");
+        // text = text.replace("\x1B[0m", "</span>");
+
+        var i = text.indexOf("\x1B[");
+        while(i >= 0){
+            var tag = ""
+            // add a new command or reset font?
+            if(text.substr(i,4) == "\x1B[0m"){ // reset
+                colorCode = "\x1B[0m";
+                tag = "</span>".repeat(tagCount);
+                tagCount = 0;
+            }
+            else {
+                tagCount += 1;
+                colorCode = text.substr(i,5);
+                if(colorCode.charAt(3) == 'm'){
+                    colorCode = colorCode.substr(0,4);
+                }
+                tag = this._getColorTag(colorCode);
+            }
+            // replace the code by the new tag
+            text = text.substr(0, i) + tag + text.substr(i+colorCode.length);
+
+            i = text.indexOf("\x1B[");
+        }
+        if(tagCount > 0){
+            text += "</span>".repeat(tagCount);
+        }
+        return text;
+    },
+
+    _getColorTag : function(colorCode){
+        var textstyle = "";
+        switch(colorCode){
+            case "\x1B[31m":
+                textstyle = "color: red;"
+                break;
+            case "\x1B[32m":
+                textstyle = "color: green;"
+                break;
+            case "\x1B[33m":
+                textstyle = "color: yellow;"
+                break;
+            case "\x1B[34m":
+                textstyle = "color: blue;"
+                break;
+            case "\x1B[35m":
+                textstyle = "color: magenta;"
+                break;
+            case "\x1B[36m":
+                textstyle = "color: cyan;"
+                break;
+            case "\x1B[37m":
+                textstyle = "color: white;"
+                break;
+            case "\x1B[41m":
+                textstyle = "background-color: red;"
+                break;
+            case "\x1B[42m":
+                textstyle = "background-color: green;"
+                break;
+            case "\x1B[43m":
+                textstyle = "background-color: yellow;"
+                break;
+            case "\x1B[44m":
+                textstyle = "background-color: blue;"
+                break;
+            case "\x1B[45m":
+                textstyle = "background-color: magenta;"
+                break;
+            case "\x1B[46m":
+                textstyle = "background-color: cyan;"
+                break;
+            case "\x1B[47m":
+                textstyle = "background-color: white;"
+                break;
+            case "\x1B[1m":
+                textstyle = "font-weight: bold;"
+                break;
+            case "\x1B[3m":
+                textstyle = "font-style: italic;"
+                break;
+            case "\x1B[4m":
+                textstyle = "text-decoration: underline;"
+                break;
+            case "\x1B[5m":
+                return "<span class=\"term-textblink\">";
+            case "\x1B[7m":
+                return "<span class=\"term-textinverted\">";
+            case "\x1B[92m": // success
+                textstyle = "color: #00EE00;"
+                break;
+            case "\x1B[95m": // header
+                textstyle = "color: #660099;"
+                break;
+            case "\x1B[94m": // info
+                textstyle = "color: #3399FF;"
+                break;
+            case "\x1B[93m": // warning
+                textstyle = "color: #FF9900;"
+                break;
+            case "\x1B[91m": // error
+                textstyle = "color: #990000;"
+                break;
+            default:
+                console.log(colorCode);
+        }
+        return "<span style=\""+textstyle+"\">";
     },
 
     // set the options of the terminal to default
