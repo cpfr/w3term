@@ -21,7 +21,7 @@ var terminal =
         var _prompt = $('<span class="prompt">'
                         +_terminal.data('options').prompt+'</span>');
         var _prev = $('<span></span>');
-        var _caret = $('<span class="textcursor blink end"> </span>');
+        var _caret = $('<span class="textcursor term-blink end"> </span>');
         var _next = $('<span></span>');
 
         _currentLine.append(_prompt).append(_prev).append(_caret).append(_next);
@@ -138,8 +138,8 @@ var terminal =
                         _caret.text(lastChar);
                         _caret.prev().text(textBefore.slice(0, -1));
                     }
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 39: // RIGHT
                     evt.preventDefault();
@@ -176,8 +176,8 @@ var terminal =
                         _caret.text(firstChar);
                         _caret.next().text(textAfter.slice(1));
                     }
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 38: // UP
                     evt.preventDefault();
@@ -210,8 +210,8 @@ var terminal =
                     _caret.addClass('end');
                     _caret.text(' ');
                     _caret.next().text('');
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 36: // HOME
                     evt.preventDefault();
@@ -227,8 +227,8 @@ var terminal =
                                       + textAfter);
                     _caret.text(firstChar);
                     _caret.prev().text('');
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 13: // ENTER
                     evt.preventDefault();
@@ -279,9 +279,12 @@ var terminal =
         _hiddenInput.keydown(keydown);
         _hiddenInput.on('input', onchange);
 
+        var elemID = element.attr("id");
+
         // insert elements
         element.before(_terminal);
         element.remove();
+        _terminal.attr("id", elemID);
         // set focus
         _hiddenInput.focus();
         // return the terminal object
