@@ -24,10 +24,65 @@
         font-family: monospace;
         font-style: normal;
     }
+
+    #forkongithub a{
+                width:200px;
+                position:absolute;
+                top:30px;
+                right:-90px;
+                transform:rotate(45deg);
+                -webkit-transform:rotate(45deg);
+                -ms-transform:rotate(45deg);
+                -moz-transform:rotate(45deg);
+                -o-transform:rotate(45deg);
+                box-shadow:4px 4px 10px rgba(0,0,0,0.8);
+                background:#000;color:#fff;
+                text-decoration:none;
+                font-family:arial,sans-serif;
+                text-align:center;
+                font-weight:bold;
+                padding:10px 40px;
+                font-size:0.75em;
+                transition:0.5s;
+            }
+            #forkongithub a:hover{
+                background:#021;
+                color:#fff;
+            }
+            #forkongithub a::before,#forkongithub a::after{
+                content:"";
+                width:100%;
+                display:block;
+                position:absolute;
+                top:1px;
+                left:0;
+                height:1px;
+                background:#fff;
+            }
+            #forkongithub a::after{
+                bottom:1px;
+                top:auto;
+            }
+
+            #forkongithub{
+                position:fixed;
+                display:block;
+                top:0;
+                right:0;
+                overflow:hidden;
+                width: 150px;
+                height:150px;
+                z-index:9999;
+            }
     </style>
 
   </head>
   <body>
+    <span id="forkongithub">
+        <a href="https://github.com/cpfr/w3term" target="_blank">
+            Fork me on GitHub
+        </a>
+    </span>
     <h1>w3term - Javascript Terminal</h1>
     <p>
     This terminal is intended to support the emulation of an interactive shell
@@ -48,6 +103,12 @@
         <li>
             Type <code>prompt ></code> to change the prompt symbol to
             <code>&gt;</code>
+        </li>
+        <li>
+            Type <code>disable</code> to disable text input for two seconds
+        </li>
+        <li>
+            Type <code>colors</code> to show all possible colors (ansi escaped)
         </li>
     </ul>
 
@@ -71,7 +132,11 @@
             Bind a callback function which evaluates the commands and implements
             behavior.
         </li>
-        <li>Compatible with non-keyboard devices</li>
+        <li>Compatible with non-keyboard devices.</li>
+        <li>
+            Sass preprocessed stylesheets make it easy to customize the
+            terminal layout and appearance.
+        </li>
     </ul>
 
     <h3>Requirements</h3>
@@ -159,7 +224,7 @@
             </ul>
         </li>
         <li>
-            <code>terminal.print(_terminal, text)</code><br/>
+            <code>terminal.println(_terminal, text, escapeHtml)</code><br/>
             Prints a line of text into the given terminal.
             <ul>
                 <li>
@@ -170,8 +235,56 @@
                     <code>text</code><br/>
                     The text which should be printed
                 </li>
+                <li>
+                    <code>escapeHtml</code><br/>
+                    (optional, default = true). If set to <code>true</code>,
+                    all HTML tags and characters will be escaped in order to
+                    avoid undesirable code injection.
+                </li>
             </ul>
         </li>
+        <li>
+            <code>terminal.print(_terminal, text, escapeHtml)</code><br/>
+            Same as <code>println</code>, but does not add a newline character
+            at the end of the text.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+                <li>
+                    <code>text</code><br/>
+                    The text which should be printed
+                </li>
+                <li>
+                    <code>escapeHtml</code><br/>
+                    (optional, default = true). If set to <code>true</code>,
+                    all HTML tags and characters will be escaped in order to
+                    avoid undesirable code injection.
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.disableInput(_terminal)</code><br/>
+            Hides the blinking caret and disables user input.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.enableInput(_terminal)</code><br/>
+            Shows the blinking caret and enables user input.
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+            </ul>
+        </li>
+
         <li>
             <code>terminal.setOptionsDefault(_terminal)</code><br/>
             Sets the terminal options to default.
@@ -239,7 +352,7 @@
                         terminal.clear(term);
                     }
                     else if(cmd == 'help'){
-                        terminal.print(term,
+                        terminal.println(term,
                                        "This terminal does not contain any help files!");
                     }
                     else if(cmd == 'colors'){
@@ -272,12 +385,14 @@
                         + " - \x1B[91merror\x1B[0m highlighting\n"
                         + "\n"
                         + "And this works also with "
-                        + "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m"
+                        + "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m\n"
                        );
                     }
-//                     else if(cmd == 'cls'){
-//                         terminal.setInput(term, "clear");
-//                     }
+                    else if(cmd == 'disable'){
+                        terminal.disableInput(term);
+                        setTimeout(function(){terminal.enableInput(term);},
+                            2000);
+                    }
                     else if(cmd.substr(0,6) == 'prompt'){
                         var sym = cmd.split(' ');
                         sym = sym[sym.length-1];

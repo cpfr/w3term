@@ -55,6 +55,9 @@ var terminal =
 
         // Catch special keys before a character is inserted -------------------
         var keydown = function(evt){
+            if(!_currentLine.is(":visible")){
+                return;
+            }
             var char = evt.keyCode;
 
             var textBefore = _caret.prev().text();
@@ -246,7 +249,6 @@ var terminal =
                     _caret.next().text('');
                     _caret.text(' ');
                     _caret.addClass('end');
-                    _currentLine.hide();
 
                     if(textWhole != ''){
                         var commandCount = _terminal.data(
@@ -270,7 +272,6 @@ var terminal =
                             textWhole, _terminal);
                     }
                     _prompt.text(_terminal.data('options').prompt);
-                    _currentLine.show();
                     _terminal.scrollTop(_terminal.prop("scrollHeight"));
                     break;
                 default:
@@ -315,10 +316,30 @@ var terminal =
     },
 
     // print text to the terminal
-    print : function(_terminal, text){
+    print : function(_terminal, text, escapeHtml){
+        if(escapeHtml === undefined){
+            escapeHtml = true;
+        }
         var _currentLine = _terminal.data('currentLine');
-        text = this._processColors(text);
-        _currentLine.before('<p class="output">'+text+'<p>');
+        if(escapeHtml){
+            text = text.replace(/&/g, "&amp;");
+            text = text.replace(/</g, "&lt;");
+            text = text.replace(/>/g, "&gt;");
+        }
+        text = this._processColors(""+text);
+
+        var outputElement = _currentLine.prev();
+        if(outputElement.hasClass("output")){
+            outputElement.append(text);
+        }
+        else{            
+            _currentLine.before('<p class="output">'+text+'</p>');
+        }
+    },
+
+    // print text to the terminal (with line ending)
+    println : function(_terminal, text, escapeHtml){
+        this.print(_terminal, text+"\n", escapeHtml);
     },
 
     _processColors : function(text){
@@ -431,6 +452,16 @@ var terminal =
                 console.log(colorCode);
         }
         return "<span style=\""+textstyle+"\">";
+    },
+
+    // hides the caret and disables user input
+    disableInput : function(_terminal){
+        _terminal.data('currentLine').hide();
+    },
+
+    // hides the caret and disables user input
+    enableInput : function(_terminal){
+        _terminal.data('currentLine').show();
     },
 
     // set the options of the terminal to default
