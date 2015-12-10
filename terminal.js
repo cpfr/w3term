@@ -335,6 +335,7 @@ var terminal =
         else{            
             _currentLine.before('<p class="output">'+text+'</p>');
         }
+        _terminal.scrollTop(_terminal.prop("scrollHeight"));
     },
 
     // print text to the terminal (with line ending)
@@ -462,6 +463,11 @@ var terminal =
     // hides the caret and disables user input
     enableInput : function(_terminal){
         _terminal.data('currentLine').show();
+    },
+
+    // scrolls down to the last line of the terminal
+    scrollDown : function(_terminal){
+        _terminal.scrollTop(_terminal.prop("scrollHeight"));
     },
 
     // set the options of the terminal to default
