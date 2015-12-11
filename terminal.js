@@ -310,6 +310,18 @@ var terminal =
         _caret.addClass('end');
     },
 
+
+    // fires a command in the terminal
+    // (as if the user had typed it and hit enter)
+    fireCommand : function(_terminal, command){
+        // copy the command into the text input
+        this.setInput(_terminal, command);
+        // create an enter key event and send it to the input element
+        var evt = $.Event("keydown");
+        evt.keyCode = 13;
+        $(_terminal).find(".hiddenInput").trigger(evt);
+    },
+
     // clear the terminal
     clear : function(_terminal){
         $(_terminal).find('p').remove();

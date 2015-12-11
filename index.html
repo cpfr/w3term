@@ -201,6 +201,21 @@
         </li>
         <li>
             <code>terminal.setInput(_terminal, text)</code><br/>
+            Fires a command in the terminal
+            (as if the user had typed it and hit enter)
+            <ul>
+                <li>
+                    <code>_terminal</code><br/>
+                    The terminal element which should be modified
+                </li>
+                <li>
+                    <code>command</code><br/>
+                    The command to fire.
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>terminal.fireCommand(_terminal, command)</code><br/>
             Sets the prompt line of the given terminal to the given text.
             <ul>
                 <li>
@@ -412,8 +427,16 @@
                     }
                 }
             });
+
+            // setTimeout(function(){
+            //     terminal.fireCommand(term, "help");
+            //     setTimeout(function(){
+            //         terminal.fireCommand(term, "clear");
+            //     }, 1000);
+            // }, 1000);
         }
     );
+    
   </script>
 
 </html>
