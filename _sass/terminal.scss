@@ -17,14 +17,10 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
 
     input.hiddenInput{
         opacity: 0;
-        width: 0;
-        height: 0;
         display: block;
         position: absolute;
-        background-color: transparent;
         outline: none;
         border: none;
-        font-size: 0;
     }
 
 
@@ -58,16 +54,16 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         white-space: pre;
     }
 
-    .blink
+    .term-blink
     {
-        animation: blink 1s step-start 0s infinite;
-        -webkit-animation: blink 1s step-start 0s infinite;
+        animation: term-blink 1s step-start 0s infinite;
+        -webkit-animation: term-blink 1s step-start 0s infinite;
     }
 }
 
 
 
-@keyframes blink {
+@keyframes term-blink {
     0%
     {
         background-color: $terminalColor;
@@ -82,7 +78,7 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         color: $terminalBackgroundColor;
     }
 }
-@-webkit-keyframes blink {
+@-webkit-keyframes term-blink {
     0%
     {
         background-color: $terminalColor;
@@ -96,4 +92,26 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         background-color: $terminalColor;
         color: $terminalBackgroundColor;
     }
+}
+
+
+
+.term-textblink {
+    animation: term-textblink 1s steps(5, start) infinite;
+    -webkit-animation: term-textblink 1s steps(5, start) infinite;
+}
+@keyframes term-textblink {
+    to {
+        visibility: hidden;
+    }
+}
+@-webkit-keyframes term-textblink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.term-textinverted{
+    color: $terminalBackgroundColor;
+    background-color: $terminalOutputColor;
 }

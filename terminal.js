@@ -1,3 +1,8 @@
+String.prototype.repeat = function( num )
+{
+    return new Array( num + 1 ).join( this );
+}
+
 var terminal =
 {
     // initialize a terminal which replaces the given element
@@ -21,7 +26,7 @@ var terminal =
         var _prompt = $('<span class="prompt">'
                         +_terminal.data('options').prompt+'</span>');
         var _prev = $('<span></span>');
-        var _caret = $('<span class="textcursor blink end"> </span>');
+        var _caret = $('<span class="textcursor term-blink end"> </span>');
         var _next = $('<span></span>');
 
         _currentLine.append(_prompt).append(_prev).append(_caret).append(_next);
@@ -50,6 +55,9 @@ var terminal =
 
         // Catch special keys before a character is inserted -------------------
         var keydown = function(evt){
+            if(!_currentLine.is(":visible")){
+                return;
+            }
             var char = evt.keyCode;
 
             var textBefore = _caret.prev().text();
@@ -138,8 +146,8 @@ var terminal =
                         _caret.text(lastChar);
                         _caret.prev().text(textBefore.slice(0, -1));
                     }
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 39: // RIGHT
                     evt.preventDefault();
@@ -176,8 +184,8 @@ var terminal =
                         _caret.text(firstChar);
                         _caret.next().text(textAfter.slice(1));
                     }
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 38: // UP
                     evt.preventDefault();
@@ -210,8 +218,8 @@ var terminal =
                     _caret.addClass('end');
                     _caret.text(' ');
                     _caret.next().text('');
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 36: // HOME
                     evt.preventDefault();
@@ -227,8 +235,8 @@ var terminal =
                                       + textAfter);
                     _caret.text(firstChar);
                     _caret.prev().text('');
-                    _caret.removeClass('blink');
-                    setTimeout(function(){_caret.addClass('blink')}, 1000);
+                    _caret.removeClass('term-blink');
+                    setTimeout(function(){_caret.addClass('term-blink')}, 1000);
                     break;
                 case 13: // ENTER
                     evt.preventDefault();
@@ -241,7 +249,6 @@ var terminal =
                     _caret.next().text('');
                     _caret.text(' ');
                     _caret.addClass('end');
-                    _currentLine.hide();
 
                     if(textWhole != ''){
                         var commandCount = _terminal.data(
@@ -265,7 +272,6 @@ var terminal =
                             textWhole, _terminal);
                     }
                     _prompt.text(_terminal.data('options').prompt);
-                    _currentLine.show();
                     _terminal.scrollTop(_terminal.prop("scrollHeight"));
                     break;
                 default:
@@ -279,9 +285,12 @@ var terminal =
         _hiddenInput.keydown(keydown);
         _hiddenInput.on('input', onchange);
 
+        var elemID = element.attr("id");
+
         // insert elements
         element.before(_terminal);
         element.remove();
+        _terminal.attr("id", elemID);
         // set focus
         _hiddenInput.focus();
         // return the terminal object
@@ -307,9 +316,158 @@ var terminal =
     },
 
     // print text to the terminal
-    print : function(_terminal, text){
+    print : function(_terminal, text, escapeHtml){
+        if(escapeHtml === undefined){
+            escapeHtml = true;
+        }
         var _currentLine = _terminal.data('currentLine');
-        _currentLine.before('<p class="output">'+text+'<p>');
+        if(escapeHtml){
+            text = text.replace(/&/g, "&amp;");
+            text = text.replace(/</g, "&lt;");
+            text = text.replace(/>/g, "&gt;");
+        }
+        text = this._processColors(""+text);
+
+        var outputElement = _currentLine.prev();
+        if(outputElement.hasClass("output")){
+            outputElement.append(text);
+        }
+        else{            
+            _currentLine.before('<p class="output">'+text+'</p>');
+        }
+        _terminal.scrollTop(_terminal.prop("scrollHeight"));
+    },
+
+    // print text to the terminal (with line ending)
+    println : function(_terminal, text, escapeHtml){
+        this.print(_terminal, text+"\n", escapeHtml);
+    },
+
+    _processColors : function(text){
+        var tagCount = 0;
+        // text = text.replace("\x1B[31m", "<span style=\"color: red;\">");
+        // text = text.replace("\x1B[0m", "</span>");
+
+        var i = text.indexOf("\x1B[");
+        while(i >= 0){
+            var tag = ""
+            // add a new command or reset font?
+            if(text.substr(i,4) == "\x1B[0m"){ // reset
+                colorCode = "\x1B[0m";
+                tag = "</span>".repeat(tagCount);
+                tagCount = 0;
+            }
+            else {
+                tagCount += 1;
+                colorCode = text.substr(i,5);
+                if(colorCode.charAt(3) == 'm'){
+                    colorCode = colorCode.substr(0,4);
+                }
+                tag = this._getColorTag(colorCode);
+            }
+            // replace the code by the new tag
+            text = text.substr(0, i) + tag + text.substr(i+colorCode.length);
+
+            i = text.indexOf("\x1B[");
+        }
+        if(tagCount > 0){
+            text += "</span>".repeat(tagCount);
+        }
+        return text;
+    },
+
+    _getColorTag : function(colorCode){
+        var textstyle = "";
+        switch(colorCode){
+            case "\x1B[31m":
+                textstyle = "color: red;"
+                break;
+            case "\x1B[32m":
+                textstyle = "color: green;"
+                break;
+            case "\x1B[33m":
+                textstyle = "color: yellow;"
+                break;
+            case "\x1B[34m":
+                textstyle = "color: blue;"
+                break;
+            case "\x1B[35m":
+                textstyle = "color: magenta;"
+                break;
+            case "\x1B[36m":
+                textstyle = "color: cyan;"
+                break;
+            case "\x1B[37m":
+                textstyle = "color: white;"
+                break;
+            case "\x1B[41m":
+                textstyle = "background-color: red;"
+                break;
+            case "\x1B[42m":
+                textstyle = "background-color: green;"
+                break;
+            case "\x1B[43m":
+                textstyle = "background-color: yellow;"
+                break;
+            case "\x1B[44m":
+                textstyle = "background-color: blue;"
+                break;
+            case "\x1B[45m":
+                textstyle = "background-color: magenta;"
+                break;
+            case "\x1B[46m":
+                textstyle = "background-color: cyan;"
+                break;
+            case "\x1B[47m":
+                textstyle = "background-color: white;"
+                break;
+            case "\x1B[1m":
+                textstyle = "font-weight: bold;"
+                break;
+            case "\x1B[3m":
+                textstyle = "font-style: italic;"
+                break;
+            case "\x1B[4m":
+                textstyle = "text-decoration: underline;"
+                break;
+            case "\x1B[5m":
+                return "<span class=\"term-textblink\">";
+            case "\x1B[7m":
+                return "<span class=\"term-textinverted\">";
+            case "\x1B[92m": // success
+                textstyle = "color: #00EE00;"
+                break;
+            case "\x1B[95m": // header
+                textstyle = "color: #660099;"
+                break;
+            case "\x1B[94m": // info
+                textstyle = "color: #3399FF;"
+                break;
+            case "\x1B[93m": // warning
+                textstyle = "color: #FF9900;"
+                break;
+            case "\x1B[91m": // error
+                textstyle = "color: #990000;"
+                break;
+            default:
+                console.log(colorCode);
+        }
+        return "<span style=\""+textstyle+"\">";
+    },
+
+    // hides the caret and disables user input
+    disableInput : function(_terminal){
+        _terminal.data('currentLine').hide();
+    },
+
+    // hides the caret and disables user input
+    enableInput : function(_terminal){
+        _terminal.data('currentLine').show();
+    },
+
+    // scrolls down to the last line of the terminal
+    scrollDown : function(_terminal){
+        _terminal.scrollTop(_terminal.prop("scrollHeight"));
     },
 
     // set the options of the terminal to default

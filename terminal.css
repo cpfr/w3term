@@ -9,14 +9,10 @@
   font-weight: 600; }
   .terminal input.hiddenInput {
     opacity: 0;
-    width: 0;
-    height: 0;
     display: block;
     position: absolute;
-    background-color: transparent;
     outline: none;
-    border: none;
-    font-size: 0; }
+    border: none; }
   .terminal .currentLine {
     outline: none;
     border: none; }
@@ -32,11 +28,11 @@
     background-color: #99ff66;
     color: black;
     white-space: pre; }
-  .terminal .blink {
-    animation: blink 1s step-start 0s infinite;
-    -webkit-animation: blink 1s step-start 0s infinite; }
+  .terminal .term-blink {
+    animation: term-blink 1s step-start 0s infinite;
+    -webkit-animation: term-blink 1s step-start 0s infinite; }
 
-@keyframes blink {
+@keyframes term-blink {
   0% {
     background-color: #99ff66;
     color: black; }
@@ -48,7 +44,7 @@
   100% {
     background-color: #99ff66;
     color: black; } }
-@-webkit-keyframes blink {
+@-webkit-keyframes term-blink {
   0% {
     background-color: #99ff66;
     color: black; }
@@ -60,3 +56,16 @@
   100% {
     background-color: #99ff66;
     color: black; } }
+.term-textblink {
+  animation: term-textblink 1s steps(5, start) infinite;
+  -webkit-animation: term-textblink 1s steps(5, start) infinite; }
+
+@keyframes term-textblink {
+  to {
+    visibility: hidden; } }
+@-webkit-keyframes term-textblink {
+  to {
+    visibility: hidden; } }
+.term-textinverted {
+  color: black;
+  background-color: #666666; }
