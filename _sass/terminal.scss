@@ -4,7 +4,7 @@ $terminalInactiveColor: darken(desaturate($terminalColor, 50%), 30%);
 $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
 
 
-.terminal
+.terminal, .w3term
 {
     overflow: auto;
     text-align: left;
