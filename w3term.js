@@ -1,11 +1,16 @@
-window.w3term = function(node){
-    function Terminal(node) {
+// TODO: on invalid key (e.g. esc), the last char is repeated => Bug
+
+window.w3term = function(node, options){
+    function Terminal(node, options) {
         // ---------------------------------------------------------------------
         var _commandHistory = [];
         var _commandStep = 0;
+        var _options = options || {};
         var _terminal = this; // because this scoping is broken in JS
+        var _inputEnabled = true;
         // ---------------------------------------------------------------------
 
+        var _node = node;
         var _hiddenInput;
         var _currentLine;
         var _prompt;
@@ -13,10 +18,9 @@ window.w3term = function(node){
         var _caret;
         var _next;
         // ---------------------------------------------------------------------
+        setOptionDefaults(_options);
 
-        node.className += " w3term";
-        // ---------------------------------------------------------------------
-
+        _node.className += " w3term";
         _hiddenInput = document.createElement("input");
         _hiddenInput.type = "text";
         _hiddenInput.className = "hiddenInput";
@@ -27,29 +31,30 @@ window.w3term = function(node){
 
         _prompt = document.createElement("span");
         _prompt.className = "prompt";
-        _prompt.textContent = ">"; // TODO: read options here
+        _prompt.textContent = _options.prompt;
 
         _prev = document.createElement("span");
         _next = document.createElement("span");
         _caret = document.createElement("span");
-        _caret.className = "textcursor term-blink end";
+        _caret.textContent = " ";
+        _caret.className = "textcursor term-blink";
 
         _currentLine.appendChild(_prompt);
         _currentLine.appendChild(_prev);
         _currentLine.appendChild(_caret);
         _currentLine.appendChild(_next);
-        node.appendChild(_hiddenInput);
-        node.appendChild(_currentLine);
+        _node.appendChild(_currentLine);
+        _node.appendChild(_hiddenInput);
 
         // --- define public methods -------------------------------------------
 
         _terminal.backspace = function() {
-            _prev.textContent = textBefore.slice(0,-1);
+            _prev.textContent = _prev.textContent.slice(0,-1);
         };
 
         _terminal.delete = function() {
-            _caret.textContent = textAfter.slice(0,1);
-            _next.textContent = textAfter.slice(1);
+            _caret.textContent = _next.textContent.slice(0,1);
+            _next.textContent = _next.textContent.slice(1);
         };
 
         _terminal.moveLeft = function() {
@@ -58,6 +63,8 @@ window.w3term = function(node){
             var lastChar = textBefore.slice(-1);
 
             if(lastChar == '') return;
+            if(_next.textContent == "" && _caret.textContent == " ")
+                _caret.textContent = "";
 
             _next.textContent = _caret.textContent+textAfter;
             _caret.textContent = lastChar;
@@ -73,20 +80,20 @@ window.w3term = function(node){
             var textBefore = _prev.textContent;
             var textAfter = _next.textContent;
 
-            if(textBefore == '') return;
+            if(textBefore == "") return;
 
             var pattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
             var matches = [];
-            while ((match = pattern.exec(textBefore)) != null){
+            while((match = pattern.exec(textBefore.slice(0, -1))) != null) {
                 matches.push(match.index);
             }
             if(matches.length > 0) {
                 // if there was a word separation, jump there
-                var newIndex = matches[matches.length-1]+1;
-                _prev.textContent = textBefore.substring(0,newIndex);
-                _next.textContent(textBefore.substring(newIndex+1)
-                                   +_caret.textContent
-                                   +_next.textContent);
+                var newIndex = matches[matches.length-1]+2;
+                _prev.textContent = textBefore.substring(0, newIndex);
+                _next.textContent = textBefore.substring(newIndex+1)
+                                   + _caret.textContent
+                                   + _next.textContent;
                 _caret.textContent = textBefore.charAt(newIndex);
 
                 _caret.classList.remove("term-blink");
@@ -104,8 +111,13 @@ window.w3term = function(node){
             var textBefore = _prev.textContent;
             var textAfter = _next.textContent;
 
+            if(textAfter == "") {
+                _terminal.end();
+                return;
+            }
+
             var firstChar = textAfter.slice(0,1);
-            _prev.textContent = textBefore+_caret.text();
+            _prev.textContent = textBefore+_caret.textContent;
             if(firstChar == "") {
                 firstChar = " ";
             }
@@ -139,7 +151,18 @@ window.w3term = function(node){
         };
 
         _terminal.home = function() {
-            // TODO
+            var textBefore = _prev.textContent;
+            var firstChar = _prev.textContent.slice(0, 1);
+            if(firstChar == "") return;
+
+            if(_next.textContent == "") _caret.textContent = "";
+
+            _next.textContent = textBefore.slice(1)
+                             + _caret.textContent
+                             + _next.textContent;
+            _caret.textContent = firstChar;
+            _prev.textContent = "";
+
             _caret.classList.remove("term-blink");
             setTimeout(function() {
                 _caret.classList.add("term-blink")
@@ -147,38 +170,148 @@ window.w3term = function(node){
         };
 
         _terminal.end = function() {
-            // TODO
+            if (_next.textContent == "" && _caret.textContent == " ") return;
+
+            _prev.textContent = _prev.textContent
+                                + _caret.textContent
+                                + _next.textContent;
+
+            _caret.textContent = " ";
+            _next.textContent = "";
+
             _caret.classList.remove("term-blink");
             setTimeout(function() {
                 _caret.classList.add("term-blink")
             }, 1000);
         };
 
+        _terminal.enter = function() {
+            var wholeText = (_prev.textContent
+                        + _caret.textContent
+                        + _next.textContent).trim();
+
+            var newLine = document.createElement("p");
+            var prompt = document.createElement("span");
+            prompt.className = "prompt";
+            prompt.textContent = _options.prompt;
+            newLine.appendChild(prompt);
+            newLine.appendChild(document.createTextNode(wholeText));
+            _node.insertBefore(newLine, _currentLine);
+
+            // new empty line
+            _prev.textContent = "";
+            _next.textContent = "";
+            _caret.textContent = " ";
+
+            if(wholeText != "") {
+                var commandCount = _commandHistory.length;
+
+                if(wholeText != _commandHistory[commandCount-1])
+                {
+                    // limit the size of the command history
+                    if(commandCount >= _options.historySize) {
+                        _commandHistory.shift();
+                    }
+                    _commandHistory.push(wholeText);
+                }
+                _commandStep = _commandHistory.length;
+
+                // process command
+                _options.processCommand(wholeText);
+            }
+            _prompt.textContent = _options.prompt;
+            _terminal.scrollToBottom();
+        };
+
+        _terminal.setInput = function(text) {
+            text = text.replace("\n", " ");
+            _prev.textContent = text;
+            _caret.textContent = " ";
+            _next.textContent = "";
+        };
+
+        _terminal.clear = function() {
+            var paragraph;
+            while(paragraph = _node.getElementsByTagName("P")[0]) {
+                _node.removeChild(paragraph);
+            }
+        };
+
+        // print text to the terminal
+        _terminal.print = function(text, escapeHtml) {
+            if(escapeHtml === undefined){
+                escapeHtml = true;
+            }
+            text = text || "";
+            if(escapeHtml) {
+                text = text.replace(/&/g, "&amp;");
+                text = text.replace(/</g, "&lt;");
+                text = text.replace(/>/g, "&gt;");
+            }
+            var textNode = processColors(text);
+
+            var outputElement = _currentLine.previousSibling;
+            if(outputElement.classList.contains("output")) {
+                outputElement.appendChild(textNode);
+            }
+            else {
+                var outParagraph = document.createElement("p");
+                outParagraph.className = "output";
+                outParagraph.appendChild(textNode);
+                _node.insertBefore(outParagraph, _currentLine);
+            }
+            _terminal.scrollToBottom();
+        };
+
+        // print text to the terminal (with line ending)
+        _terminal.println = function(text, escapeHtml) {
+            _terminal.print(text+"\n", escapeHtml);
+        };
+
+        // scrolls down to the last line of the terminal
+        _terminal.scrollToBottom = function() {
+            _terminal.scrollTop = _terminal.scrollHeight;
+        };
+
+        // hides the caret and disables user input
+        _terminal.disableInput = function(){
+            _currentLine.style.display = "none";
+            _inputEnabled = false;
+            _hiddenInput.blur();
+        },
+
+        // hides the caret and disables user input
+        _terminal.enableInput = function(){
+            _currentLine.style.display = "inline";
+            _inputEnabled = true;
+            _hiddenInput.focus();
+        },
 
         // --- define handlers -------------------------------------------------
         // set focus to currentLine when terminal is clicked -------------------
-        node.onclick = function(evt) {
+        _node.onclick = function(evt) {
+            _hiddenInput.focus();
+        };
+
+        _node.focus = function() {
             _hiddenInput.focus();
         };
 
         // Insert Charcters when a key is pressed ------------------------------
-        node.onchange = function(evt){
+        _node.oninput = function(evt) {
             _prev.textContent += _hiddenInput.value;
             _hiddenInput.value = "";
         };
 
         // Catch special keys before a character is inserted -------------------
-        node.onkeydown = function(evt){
-            // TODO: determine whether we need something similar here...
-            // if(!_currentLine.is(":visible")){
-            //     return;
-            // }
+        _node.onkeydown = function(evt) {
+            if(!_inputEnabled) return;
             var char = evt.keyCode;
 
             var textBefore = _prev.textContent;
             var textAfter = _next.textContent;
 
-            switch(char){
+            switch(char) {
                 case 8: // BACKSPACE
                     evt.preventDefault();
                     _terminal.backspace();
@@ -194,116 +327,56 @@ window.w3term = function(node){
                     evt.preventDefault();
                     // if the ctrl key is pressed, we move until the next
                     // non-character symbol
-                    if(evt.ctrlKey) {
-                        _terminal.skipLeft();
-                    }
-                    // if not, we just move one character to the left
-                    else {
-                        _terminal.moveLeft();
-                    }
+                    if(evt.ctrlKey) _terminal.skipLeft();
+                    else _terminal.moveLeft();
                     break;
                 case 39: // RIGHT
                     evt.preventDefault();
                     // if the ctrl key is pressed, we move until the next
                     // non-character symbol
-                    if(evt.ctrlKey){
-                        _terminal.skipRight();
-                    }
-                    else{
-                        _terminal.moveRight();
+                    if(evt.ctrlKey) _terminal.skipRight();
+                    else _terminal.moveRight();
+                    break;
+                case 38: // UP
+                    evt.preventDefault();
+                    var step = _commandStep;
+                    if(step > 0) {
+                        step--;
+                        _terminal.setInput(_commandHistory[step]);
+                        _commandStep = step;
                     }
                     break;
-                // case 38: // UP
-                //     evt.preventDefault();
-                //     var step = node.data('commandStep');
-                //     if(step > 0){
-                //         step--;
-                //         terminal.setInput(node,
-                //                  node.data('commandHistory')[step]);
-                //         node.data('commandStep', step);
-                //     }
-                //     break;
-                // case 40: // DOWN
-                //     evt.preventDefault();
-                //     var step = node.data('commandStep');
-                //     if(step < node.data('commandHistory').length){
-                //         step++;
-                //         if(step == node.data('commandHistory').length){
-                //             terminal.setInput(node, '');
-                //         } else {
-                //             terminal.setInput(node,
-                //                     node.data('commandHistory')[step]);
-                //         }
-                //         node.data('commandStep', step);
-                //     }
-                //     break;
-                // case 35: // END
-                //     evt.preventDefault();
-                //     if(_caret.hasClass('end')){return;}
-                //     _caret.prev().text(textBefore+_caret.text()+textAfter);
-                //     _caret.addClass('end');
-                //     _caret.text(' ');
-                //     _caret.next().text('');
-                //     _caret.removeClass('term-blink');
-                //     setTimeout(function(){_caret.addClass('term-blink')}, 1000);
-                //     break;
-                // case 36: // HOME
-                //     evt.preventDefault();
-                //     var firstChar = textBefore.slice(0,1);
-                //     if(firstChar == ''){return;}
-                //     if(_caret.hasClass('end'))
-                //     {
-                //         _caret.text('');
-                //         _caret.removeClass('end');
-                //     }
-                //     _caret.next().text(textBefore.slice(1)
-                //                       + _caret.text()
-                //                       + textAfter);
-                //     _caret.text(firstChar);
-                //     _caret.prev().text('');
-                //     _caret.removeClass('term-blink');
-                //     setTimeout(function(){_caret.addClass('term-blink')}, 1000);
-                //     break;
-                // case 13: // ENTER
-                //     evt.preventDefault();
-                //     var textWhole = (textBefore+_caret.text()+textAfter).trim();
-                //     _caret.parent().before('<p><span class="prompt">'
-                //                           +node.data('options').prompt
-                //                           +'</span>'+textWhole+'</p>');
-                //     // new empty line
-                //     _caret.prev().text('');
-                //     _caret.next().text('');
-                //     _caret.text(' ');
-                //     _caret.addClass('end');
-                //
-                //     if(textWhole != ''){
-                //         var commandCount = node.data(
-                //                                     'commandHistory').length;
-                //
-                //         if(textWhole !=
-                //         node.data('commandHistory')[commandCount-1])
-                //         {
-                //             // limit the size of the command history
-                //             if(commandCount >= node.data('options')
-                //                 .historySize){
-                //                 node.data('commandHistory').shift();
-                //             }
-                //             node.data('commandHistory').push(textWhole);
-                //         }
-                //         node.data('commandStep',
-                //                     node.data('commandHistory').length);
-                //
-                //         // process command
-                //         node.data('options').processCommand(
-                //             textWhole, node);
-                //     }
-                //     _prompt.text(node.data('options').prompt);
-                //     node.scrollTop(_terminal.prop("scrollHeight"));
-                //     break;
+                case 40: // DOWN
+                    evt.preventDefault();
+                    var step = _commandStep;
+                    if(step < _commandHistory.length) {
+                        step++;
+                        if(step == _commandHistory.length) {
+                            _terminal.setInput("");
+                        } else {
+                            _terminal.setInput(_commandHistory[step]);
+                        }
+                        _commandStep = step;
+                    }
+                    break;
+                case 35: // END
+                    evt.preventDefault();
+                    _terminal.end();
+                    break;
+                case 36: // HOME
+                    evt.preventDefault();
+                    _terminal.home();
+                    break;
+                case 13: // ENTER
+                    evt.preventDefault();
+                    _terminal.enter();
+                    break;
                 default:
                     break;
             }
-        }
+        };
+        // ---------------------------------------------------------------------
+        _node.focus();
     }
 
     // -------------------------------------------------------------------------
@@ -323,14 +396,138 @@ window.w3term = function(node){
         return node;
     }
 
+    function setOptionDefaults(options) {
+        if(!options.prompt) options.prompt = '> ';
+        if(!options.historySize) options.historySize = 100;
+
+        if(!options.processCommand) {
+            options.processCommand = function(cmd){
+                console.log(cmd);
+            };
+        }
+    }
+
     // clears all children and text content from a node
     function clearNode(node){
         while(node.firstChild){
             node.removeChild(node.firstChild);
         }
     }
+
+    function processColors(text){
+        var rootTag = document.createElement("span");
+        var currentTag = rootTag;
+
+        var i = text.indexOf("\x1B[");
+        while(i >= 0) {
+            currentTag.appendChild(document.createTextNode(text.substr(0, i)));
+
+            // add a new command or reset font?
+            if(text.substr(i, 4) == "\x1B[0m"){ // reset
+                currentTag = rootTag;
+                colorCode = "\x1B[0m";
+            }
+            else {
+                colorCode = text.substr(i, 5);
+                if(colorCode.charAt(3) == 'm') {
+                    colorCode = colorCode.substr(0, 4);
+                }
+                var newTag = getColorTag(colorCode);
+                currentTag.appendChild(newTag);
+                currentTag = newTag;
+            }
+            // replace the code by the new tag
+            text = text.substr(i + colorCode.length);
+            i = text.indexOf("\x1B[");
+        }
+        currentTag.appendChild(document.createTextNode(text));
+        return rootTag;
+    }
+
+    function getColorTag(colorCode) {
+        var tag = document.createElement("span");
+        switch(colorCode){
+            case "\x1B[31m":
+                tag.style.color = "red";
+                break;
+            case "\x1B[32m":
+                tag.style.color = "green";
+                break;
+            case "\x1B[33m":
+                tag.style.color = "yellow";
+                break;
+            case "\x1B[34m":
+                tag.style.color = "blue";
+                break;
+            case "\x1B[35m":
+                tag.style.color = "magenta";
+                break;
+            case "\x1B[36m":
+                tag.style.color = "cyan";
+                break;
+            case "\x1B[37m":
+                tag.style.color = "white";
+                break;
+            case "\x1B[41m":
+                tag.style.backgroundColor = "red";
+                break;
+            case "\x1B[42m":
+                tag.style.backgroundColor = "green";
+                break;
+            case "\x1B[43m":
+                tag.style.backgroundColor = "yellow";
+                break;
+            case "\x1B[44m":
+                tag.style.backgroundColor = "blue";
+                break;
+            case "\x1B[45m":
+                tag.style.backgroundColor = "magenta";
+                break;
+            case "\x1B[46m":
+                tag.style.backgroundColor = "cyan";
+                break;
+            case "\x1B[47m":
+                tag.style.backgroundColor = "white";
+                break;
+            case "\x1B[1m":
+                tag.style.fontWeight = "bold";
+                break;
+            case "\x1B[3m":
+                tag.style.fontStyle = "italic";
+                break;
+            case "\x1B[4m":
+                tag.style.textDecoration = "underline";
+                break;
+            case "\x1B[5m":
+                tag.className = "term-textblink";
+                break;
+            case "\x1B[7m":
+                tag.className = "term-textinverted";
+                break;
+            case "\x1B[92m": // success
+                tag.style.color = "#00EE00";
+                break;
+            case "\x1B[95m": // header
+                tag.style.color = "#660099";
+                break;
+            case "\x1B[94m": // info
+                tag.style.color = "#3399FF";
+                break;
+            case "\x1B[93m": // warning
+                tag.style.color = "#FF9900";
+                break;
+            case "\x1B[91m": // error
+                tag.style.color = "#990000";
+                break;
+            default:
+                break;
+        }
+        return tag;
+    }
+
     // -------------------------------------------------------------------------
 
     node = getNodeArg(node);
-    node.w3term = new Terminal(node);
+    node.w3term = new Terminal(node, options);
+    return node;
 }
