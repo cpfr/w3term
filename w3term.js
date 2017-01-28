@@ -231,14 +231,14 @@ window.w3term = function(node, options){
                 _commandStep = _commandHistory.length;
 
                 // process command
-                _options.processCommand(wholeText);
+                _options.processCommand(wholeText, parseBashArgs(wholeText));
             }
             _prompt.textContent = _options.prompt;
             _terminal.scrollToBottom();
         };
 
         _terminal.setInput = function(text) {
-            text = text.replace("\n", " ");
+            text = text.replace(/(?:\r\n|\r|\n)/g, " ");
             _prev.textContent = text;
             _caret.textContent = " ";
             _next.textContent = "";
@@ -546,6 +546,52 @@ window.w3term = function(node, options){
         return tag;
     }
 
+    function parseBashString(cmdString, i) {
+        var startIndex = i;
+        var escaped = false;
+        for(; i < cmdString.length; i++) {
+            if(!escaped && cmdString.charAt(i) == "\\") {
+                escaped = true;
+                continue;
+            }
+            if(!escaped && cmdString.charAt(i) == "\"") {
+                break;
+            }
+            escaped = false;
+        }
+        return {
+            arg : cmdString.slice(startIndex, i),
+            i : i+1
+        };
+    }
+
+    function parseBashArgs(cmdString) {
+        var outputArgs = [];
+        var escaped = false;
+        var inString = false;
+        var startIndex = 0;
+        for(var i = 0; i < cmdString.length; i++) {
+            if(cmdString.charAt(i) == "\"") {
+                result = parseBashString(cmdString, i+1);
+                outputArgs.push(result.arg);
+                i = result.i;
+                startIndex = i;
+            }
+            else if(cmdString.charAt(i) == "\\") {
+                escaped = !escaped;
+            }
+            else if(!inString && cmdString.charAt(i) == " " && !escaped) {
+                var arg = cmdString.slice(startIndex, i);
+                outputArgs.push(arg.replace("\\ ", " "));
+                startIndex = i + 1;
+            }
+        }
+        var endString = cmdString.slice(startIndex, cmdString.length);
+        if(endString != "") {
+            outputArgs.push(endString.replace("\\ ", " "));
+        }
+        return outputArgs;
+    }
     // -------------------------------------------------------------------------
 
     node = getNodeArg(node);
