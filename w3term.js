@@ -6,6 +6,7 @@ window.w3term = function(node, options){
         var _options = options || {};
         var _terminal = this; // because this scoping is broken in JS
         var _inputEnabled = true;
+        var _skipPattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
         // ---------------------------------------------------------------------
 
         var _node = node;
@@ -50,6 +51,23 @@ window.w3term = function(node, options){
             _prev.textContent = _prev.textContent.slice(0,-1);
         };
 
+        _terminal.skipBackspace = function() {
+            var matches = [];
+            while((match = _skipPattern.exec(
+                _prev.textContent.slice(0, -1))) != null)
+            {
+                matches.push(match.index);
+            }
+            if(matches.length > 0) {
+                // if there was a word separation, jump there
+                var newIndex = matches[matches.length-1]+2;
+                _prev.textContent = _prev.textContent.slice(0, newIndex);
+            }
+            else {
+                _prev.textContent = "";
+            }
+        };
+
         _terminal.delete = function() {
             _caret.textContent = _next.textContent.slice(0,1);
             _next.textContent = _next.textContent.slice(1);
@@ -80,9 +98,8 @@ window.w3term = function(node, options){
 
             if(textBefore == "") return;
 
-            var pattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
             var matches = [];
-            while((match = pattern.exec(textBefore.slice(0, -1))) != null) {
+            while((match = _skipPattern.exec(textBefore.slice(0, -1))) != null) {
                 matches.push(match.index);
             }
             if(matches.length > 0) {
@@ -132,8 +149,7 @@ window.w3term = function(node, options){
             var textBefore = _prev.textContent;
             var textAfter = _next.textContent;
 
-            var pattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
-            match = pattern.exec(textAfter);
+            match = _skipPattern.exec(textAfter);
             if(match) {
                 // if there was a word separation, jump there
                 var newIndex = match.index+1;
@@ -297,7 +313,6 @@ window.w3term = function(node, options){
 
         // Insert Charcters when a key is pressed ------------------------------
         _node.oninput = function(evt) {
-            console.log(evt, _hiddenInput.value);
             _prev.textContent += _hiddenInput.value;
             _hiddenInput.value = "";
         };
@@ -316,7 +331,11 @@ window.w3term = function(node, options){
                     break;
                 case 8: // BACKSPACE
                     evt.preventDefault();
-                    _terminal.backspace();
+                    if(evt.altKey)
+                        _terminal.skipBackspace();
+                    else {
+                        _terminal.backspace();
+                    }
                     break;
                 case 46: // DEL
                     evt.preventDefault();
