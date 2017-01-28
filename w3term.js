@@ -1,5 +1,3 @@
-// TODO: on invalid key (e.g. esc), the last char is repeated => Bug
-
 window.w3term = function(node, options){
     function Terminal(node, options) {
         // ---------------------------------------------------------------------
@@ -299,6 +297,7 @@ window.w3term = function(node, options){
 
         // Insert Charcters when a key is pressed ------------------------------
         _node.oninput = function(evt) {
+            console.log(evt, _hiddenInput.value);
             _prev.textContent += _hiddenInput.value;
             _hiddenInput.value = "";
         };
@@ -312,6 +311,9 @@ window.w3term = function(node, options){
             var textAfter = _next.textContent;
 
             switch(char) {
+                case 27: // ESCAPE
+                    evt.preventDefault();
+                    break;
                 case 8: // BACKSPACE
                     evt.preventDefault();
                     _terminal.backspace();
