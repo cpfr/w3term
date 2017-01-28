@@ -284,7 +284,7 @@ window.w3term = function(node, options){
 
         // scrolls down to the last line of the terminal
         _terminal.scrollToBottom = function() {
-            _terminal.scrollTop = _terminal.scrollHeight;
+            _node.scrollTop = _node.scrollHeight;
         };
 
         // hides the caret and disables user input
