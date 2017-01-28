@@ -546,22 +546,29 @@ window.w3term = function(node, options){
         return tag;
     }
 
-    function parseBashString(cmdString, i) {
+    function parseBashArg(char, cmdString, i) {
         var startIndex = i;
+        var text = "";
         var escaped = false;
         for(; i < cmdString.length; i++) {
             if(!escaped && cmdString.charAt(i) == "\\") {
                 escaped = true;
                 continue;
             }
-            if(!escaped && cmdString.charAt(i) == "\"") {
-                break;
+            if(cmdString.charAt(i) == char) {
+                if(escaped) {
+                    text += cmdString.slice(startIndex, i-1) + char;
+                    startIndex = i+1;
+                }
+                else {
+                    break;
+                }
             }
             escaped = false;
         }
         return {
-            arg : cmdString.slice(startIndex, i),
-            i : i+1
+            arg : text + cmdString.slice(startIndex, i),
+            i : i
         };
     }
 
@@ -569,26 +576,20 @@ window.w3term = function(node, options){
         var outputArgs = [];
         var escaped = false;
         var inString = false;
-        var startIndex = 0;
         for(var i = 0; i < cmdString.length; i++) {
             if(cmdString.charAt(i) == "\"") {
-                result = parseBashString(cmdString, i+1);
+                result = parseBashArg("\"", cmdString, i+1);
+                outputArgs.push(result.arg);
+                i = result.i+1; // skip not only the quote, but also whitespace
+            }
+            else {
+                result = parseBashArg(" ", cmdString, i);
                 outputArgs.push(result.arg);
                 i = result.i;
-                startIndex = i;
-            }
-            else if(cmdString.charAt(i) == "\\") {
-                escaped = !escaped;
-            }
-            else if(!inString && cmdString.charAt(i) == " " && !escaped) {
-                var arg = cmdString.slice(startIndex, i);
-                outputArgs.push(arg.replace("\\ ", " "));
-                startIndex = i + 1;
             }
         }
-        var endString = cmdString.slice(startIndex, cmdString.length);
-        if(endString != "") {
-            outputArgs.push(endString.replace("\\ ", " "));
+        if(i < cmdString.length) {
+            outputArgs.push(cmdString.slice(i, cmdString.length));
         }
         return outputArgs;
     }
