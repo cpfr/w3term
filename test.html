@@ -101,8 +101,8 @@
             Type <code>clear</code> and it will erase the terminal contents.
         </li>
         <li>
-            Type <code>prompt ></code> to change the prompt symbol to
-            <code>&gt;</code>
+            Type <code>prompt "&gt; "</code> to change the prompt symbol to
+            <code>&gt; </code>
         </li>
         <li>
             Type <code>disable</code> to disable text input for two seconds
@@ -123,7 +123,9 @@
             Quick navigation between words using
             CTRL+LEFT / CTRL+RIGHT
         </li>
-        <!-- <li> TODO: Alt+Backspace-delete</li> -->
+        <li>
+            ALT+Backspace deletes a whole word.
+        </li>
         <li>
             Browsing through command history using UP and DOWN keys
         </li>
@@ -295,15 +297,14 @@ var term = w3term(document.getElementById("foo"),
         prompt : '$ ',
         historySize : 4,
         processCommand : function(cmd, args) {
-            console.log(args);
-            if(cmd == "clear"){
+            if(args[0] == "clear"){
                 term.w3term.clear();
             }
-            else if(cmd == 'help') {
+            else if(args[0] == 'help') {
                 term.w3term.println(
                            "This terminal does not contain any help files!");
             }
-            else if(cmd == 'colors') {
+            else if(args[0] == 'colors') {
                 term.w3term.print(
                     "This terminal supports different colors and font styles\n"
                     + "according to the ANSI escape codes:\n"
@@ -336,14 +337,18 @@ var term = w3term(document.getElementById("foo"),
                     +  "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m\n"
                );
             }
-            else if(cmd == 'disable') {
+            else if(args[0] == 'disable') {
                 term.w3term.disableInput();
                 setTimeout(function() { term.w3term.enableInput(); }, 2000);
             }
-            else if(cmd.substr(0,6) == 'prompt') {
-                // var sym = cmd.split(' ');
-                // sym = sym[sym.length-1];
-                // terminal.setOptions(term, {prompt : sym});
+            else if(args[0] == 'prompt') {
+                if(args.length != 2) {
+                    term.w3term.print(
+                        "the 'prompt' command needs exactly one argument.")
+                }
+                else {
+                    term.w3term.setOptions({prompt : args[1]});
+                }
             }
             else {
                 console.log('cmd: "' + cmd + '"');

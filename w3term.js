@@ -3,7 +3,13 @@ window.w3term = function(node, options){
         // ---------------------------------------------------------------------
         var _commandHistory = [];
         var _commandStep = 0;
-        var _options = options || {};
+        var _options = {
+            prompt : "> ",
+            historySize : 100,
+            processCommand : function(string, args) {
+                console.log(string, args);
+            }
+        };
         var _terminal = this; // because this scoping is broken in JS
         var _inputEnabled = true;
         var _skipPattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
@@ -17,7 +23,7 @@ window.w3term = function(node, options){
         var _caret;
         var _next;
         // ---------------------------------------------------------------------
-        setOptionDefaults(_options);
+        setOptions(_options, options);
 
         _node.className += " w3term";
         _hiddenInput = document.createElement("input");
@@ -301,6 +307,10 @@ window.w3term = function(node, options){
             _hiddenInput.focus();
         },
 
+        _terminal.setOptions = function (options) {
+            setOptions(_options, options);
+        }
+
         // --- define handlers -------------------------------------------------
         // set focus to currentLine when terminal is clicked -------------------
         _node.onclick = function(evt) {
@@ -415,17 +425,6 @@ window.w3term = function(node, options){
             node = newNode;
         }
         return node;
-    }
-
-    function setOptionDefaults(options) {
-        if(!options.prompt) options.prompt = '> ';
-        if(!options.historySize) options.historySize = 100;
-
-        if(!options.processCommand) {
-            options.processCommand = function(cmd){
-                console.log(cmd);
-            };
-        }
     }
 
     // clears all children and text content from a node
@@ -593,6 +592,18 @@ window.w3term = function(node, options){
         }
         return outputArgs;
     }
+
+    function setOptions(original, newValues) {
+        if(newValues.prompt !== undefined)
+            original.prompt = newValues.prompt;
+
+        if(newValues.historySize !== undefined)
+            original.historySize = newValues.historySize;
+
+        if(newValues.processCommand !== undefined)
+            original.processCommand = newValues.processCommand;
+    }
+
     // -------------------------------------------------------------------------
 
     node = getNodeArg(node);
