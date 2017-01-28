@@ -100,7 +100,6 @@ window.w3term = function(node, options){
 
         _terminal.skipLeft = function() {
             var textBefore = _prev.textContent;
-            var textAfter = _next.textContent;
 
             if(textBefore == "") return;
 
@@ -108,8 +107,11 @@ window.w3term = function(node, options){
             while((match = _skipPattern.exec(textBefore.slice(0, -1))) != null) {
                 matches.push(match.index);
             }
+            // if there was a word separation, jump there
             if(matches.length > 0) {
-                // if there was a word separation, jump there
+                if (_next.textContent == "")
+                    _caret.textContent = "";
+
                 var newIndex = matches[matches.length-1]+2;
                 _prev.textContent = textBefore.substring(0, newIndex);
                 _next.textContent = textBefore.substring(newIndex+1)
