@@ -95,7 +95,7 @@ window.w3term = function(node, options){
                 _next.textContent = wholeText.substring(1);
             }
             else if(pos >= wholeText.length) {
-                _prev.textContent = wholeText.substring(0, wholeText.length-2);
+                _prev.textContent = wholeText.substring(0, wholeText.length-1);
                 _caret.textContent = wholeText.charAt(wholeText.length-1);
                 _next.textContent = "";
             }
