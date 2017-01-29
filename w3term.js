@@ -95,8 +95,8 @@ window.w3term = function(node, options){
                 _next.textContent = wholeText.substring(1);
             }
             else if(pos >= wholeText.length) {
-                _prev.textContent = wholeText;
-                _caret.textContent = " ";
+                _prev.textContent = wholeText.substring(0, wholeText.length-2);
+                _caret.textContent = wholeText.charAt(wholeText.length-1);
                 _next.textContent = "";
             }
             else {
@@ -145,7 +145,7 @@ window.w3term = function(node, options){
             match = _skipPattern.exec(textAfter);
             if(match) {
                 // if there was a word separation, jump there
-                var newIndex = match.index+1;
+                var newIndex = match.index+2;
                 _terminal.navigate(newIndex);
             } else {
                 // if there was no word separation, perform as if
@@ -159,7 +159,7 @@ window.w3term = function(node, options){
         };
 
         _terminal.end = function() {
-            _terminal.navigate(_prev.textContent
+            _terminal.navigate(_prev.textContent.length
                 + _caret.textContent.length
                 + _next.textContent.length
                 -1);
