@@ -10,7 +10,7 @@ window.w3term = function(node, options){
                 console.log(string, args);
             }
         };
-        var _terminal = this; // because this scoping is broken in JS
+        var _terminal = this; // because 'this' scoping is broken in JS
         var _inputEnabled = true;
         var _skipPattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
         // ---------------------------------------------------------------------
@@ -411,7 +411,7 @@ window.w3term = function(node, options){
             }
             else {
                 colorCode = text.substr(i, 5);
-                if(colorCode.charAt(3) == 'm') {
+                if(colorCode.charAt(3) == "m") {
                     colorCode = colorCode.substr(0, 4);
                 }
                 var newTag = getColorTag(colorCode);
