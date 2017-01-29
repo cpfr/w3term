@@ -12,29 +12,30 @@
     <style type="text/css">
     .w4term
     {
-        background-color: red;
-        color: yellow;
+        border: 1px solid black;
+        background-color: #dedede;
+        color: #111111;
     }
 
     .w4term-textinverted{
-        color: red;
-        background-color: orange; /* output color */
+        color: #dedede;
+        background-color: #333333; /* output color */
     }
 
     .w4term p
     {
-        color: #888833;
+        color: #555555;
     }
 
     .w4term .output
     {
-        color: orange;
+        color: #333333;
     }
 
     .w4term .textcursor
     {
-        background-color: yellow;
-        color: red;
+        background-color: #111111;
+        color: #dedede;
     }
 
     .w4term .w4term-blink
@@ -45,16 +46,16 @@
     @keyframes w4term-blink {
         0%
         {
-            background-color: yellow;
-            color: red;
+            background-color: #111111;
+            color: #dedede;
         }
         50% {
             background-color: transparent;
-            color: yellow;
+            color: #111111;
         }
         100% {
-            background-color: yellow;
-            color: red;
+            background-color: #111111;
+            color: #dedede;
         }
     }
     </style>
@@ -65,10 +66,11 @@
     <div id="t4"></div>
   </body>
   <script type="application/javascript">
-  var t1 = w3term(document.getElementById("t1", {
+  var t1 = w3term(document.getElementById("t1"));
+  var t2 = w3term(document.getElementById("t2"),
+  {
       stylePrefix : "w4term"
-  }));
-  var t2 = w3term(document.getElementById("t2"));
+  });
   var t3 = w3term(document.getElementById("t3"));
   var t4 = w3term(document.getElementById("t4"));
   </script>

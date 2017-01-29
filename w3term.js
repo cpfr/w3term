@@ -6,6 +6,7 @@ window.w3term = function(node, options){
         var _options = {
             prompt : "> ",
             historySize : 100,
+            stylePrefix : "",
             processCommand : function(string, args) {
                 console.log(string, args);
             }
@@ -13,6 +14,10 @@ window.w3term = function(node, options){
         var _terminal = this; // because 'this' scoping is broken in JS
         var _inputEnabled = true;
         var _skipPattern = /([A-Za-z][^A-Za-z]|[0-9][^0-9])/g;
+
+        var _caretClassNames = ["w3term-blink"];
+        var _tagClassBlinkNames = ["w3term-textblink"];
+        var _tagClassInvertedNames = ["w3term-textinverted"];
         // ---------------------------------------------------------------------
 
         var _node = node;
@@ -23,7 +28,7 @@ window.w3term = function(node, options){
         var _caret;
         var _next;
         // ---------------------------------------------------------------------
-        setOptions(_options, options);
+        setOptions(_terminal, options);
 
         _node.className += " w3term";
         _hiddenInput = document.createElement("input");
@@ -105,9 +110,13 @@ window.w3term = function(node, options){
                 _next.textContent = wholeText.substring(pos+1);
             }
 
-            _caret.classList.remove("w3term-blink");
+            for(var i = 0; i < _caretClassNames; i++) {
+                _caret.classList.remove(_caretClassNames[i]);
+            }
             setTimeout(function() {
-                _caret.classList.add("w3term-blink")
+                for(var i = 0; i < _caretClassNames; i++) {
+                    _caret.classList.add(_caretClassNames[i]);
+                }
             }, 1000);
         };
 
@@ -267,11 +276,43 @@ window.w3term = function(node, options){
             _currentLine.style.display = "inline";
             _inputEnabled = true;
             _hiddenInput.focus();
-        },
+        };
 
         _terminal.setOptions = function (options) {
             setOptions(_options, options);
-        }
+        };
+
+        _terminal.setStylePrefix = function(stylePrefix) {
+            oldStylePrefix = _options.stylePrefix;
+            _options.stylePrefix = stylePrefix;
+
+
+            // whole terminal
+            try {
+                _node.classList.remove(oldStylePrefix);
+            } catch(e) { }
+            try {
+                _caret.classList.remove(oldStylePrefix + "-blink");
+                _caret.classList.remove(oldStylePrefix + "-blink");
+            } catch(e) { }
+
+            // TODO: existing blinking output?
+
+            while(_caretClassNames.length > 1)
+                _caretClassNames.pop();
+            while(_tagClassBlinkNames.length > 1)
+                _tagClassBlinkNames.pop();
+            while(_tagClassInvertedNames.length > 1)
+                _tagClassInvertedNames.pop();
+
+            if(stylePrefix) {
+                _node.classList.add(stylePrefix);
+                _caret.classList.add(stylePrefix + "-blink");
+                _caretClassNames.push(stylePrefix + "-blink");
+                _tagClassBlinkNames.push(stylePrefix + "-textblink");
+                _tagClassInvertedNames.push(stylePrefix + "-textinverted");
+            }
+        };
 
         // --- define handlers -------------------------------------------------
         // set focus to currentLine when terminal is clicked -------------------
@@ -369,6 +410,9 @@ window.w3term = function(node, options){
             }
         };
         // ---------------------------------------------------------------------
+        if(options && options.stylePrefix) {
+            _terminal.setStylePrefix(options.stylePrefix);
+        }
         _node.focus();
     }
 
@@ -481,10 +525,16 @@ window.w3term = function(node, options){
                 tag.style.textDecoration = "underline";
                 break;
             case "\x1B[5m":
-                tag.className = "w3term-textblink";
+                // tag.className = "w3term-textblink";
+                for(var i = 0; i < _tagClassBlinkNames; i++) {
+                    tag.classList.add(_tagClassBlinkNames[i]);
+                }
                 break;
             case "\x1B[7m":
-                tag.className = "w3term-textinverted";
+                // tag.className = "w3term-textinverted";
+                for(var i = 0; i < _tagClassInvertedNames; i++) {
+                    tag.classList.add(_tagClassInvertedNames[i]);
+                }
                 break;
             case "\x1B[92m": // success
                 tag.style.color = "#00EE00";
@@ -555,7 +605,7 @@ window.w3term = function(node, options){
         return outputArgs;
     }
 
-    function setOptions(original, newValues) {
+    function setOptions(_terminal, original, newValues) {
         newValues = newValues || {};
         if(newValues.prompt !== undefined)
             original.prompt = newValues.prompt;
@@ -565,6 +615,10 @@ window.w3term = function(node, options){
 
         if(newValues.processCommand !== undefined)
             original.processCommand = newValues.processCommand;
+
+        if(newValues.stylePrefix && _terminal.setStylePrefix) {
+            _terminal.setStylePrefix(newValues.stylePrefix);
+        }
     }
 
     // -------------------------------------------------------------------------
