@@ -79,23 +79,40 @@ window.w3term = function(node, options){
             _next.textContent = _next.textContent.slice(1);
         };
 
-        _terminal.moveLeft = function() {
-            var textBefore = _prev.textContent;
-            var textAfter = _next.textContent;
-            var lastChar = textBefore.slice(-1);
+        _terminal.navigate = function(pos) {
+            if(pos == _prev.textContent.length) return;
+            var wholeText = _prev.textContent
+                          + _caret.textContent
+                          + _next.textContent;
 
-            if(lastChar == '') return;
-            if(_next.textContent == "" && _caret.textContent == " ")
-                _caret.textContent = "";
-
-            _next.textContent = _caret.textContent+textAfter;
-            _caret.textContent = lastChar;
-            _prev.textContent = textBefore.slice(0, -1);
+            if(pos <= 0) {
+                pos = 0;
+                _prev.textContent = "";
+                if(wholeText.length == 0)
+                    _caret.textContent = " ";
+                else
+                    _caret.textContent = wholeText.charAt(0);
+                _next.textContent = wholeText.substring(1);
+            }
+            else if(pos >= wholeText.length) {
+                _prev.textContent = wholeText;
+                _caret.textContent = " ";
+                _next.textContent = "";
+            }
+            else {
+                _prev.textContent = wholeText.substring(0, pos);
+                _caret.textContent = wholeText.charAt(pos);
+                _next.textContent = wholeText.substring(pos+1);
+            }
 
             _caret.classList.remove("term-blink");
             setTimeout(function() {
                 _caret.classList.add("term-blink")
             }, 1000);
+        };
+
+        _terminal.moveLeft = function() {
+            _terminal.navigate(_prev.textContent.length-1);
         };
 
         _terminal.skipLeft = function() {
@@ -109,20 +126,8 @@ window.w3term = function(node, options){
             }
             // if there was a word separation, jump there
             if(matches.length > 0) {
-                if (_next.textContent == "")
-                    _caret.textContent = "";
-
                 var newIndex = matches[matches.length-1]+2;
-                _prev.textContent = textBefore.substring(0, newIndex);
-                _next.textContent = textBefore.substring(newIndex+1)
-                                   + _caret.textContent
-                                   + _next.textContent;
-                _caret.textContent = textBefore.charAt(newIndex);
-
-                _caret.classList.remove("term-blink");
-                setTimeout(function() {
-                    _caret.classList.add("term-blink")
-                }, 1000);
+                _terminal.navigate(newIndex);
             } else {
                 // if there was no word separation, perform as if
                 // the home button was pressed
@@ -131,40 +136,17 @@ window.w3term = function(node, options){
         };
 
         _terminal.moveRight = function() {
-            var textBefore = _prev.textContent;
-            var textAfter = _next.textContent;
-
-            if(textAfter == "") {
-                _terminal.end();
-                return;
-            }
-
-            var firstChar = textAfter.slice(0,1);
-            _prev.textContent = textBefore+_caret.textContent;
-            if(firstChar == "") {
-                firstChar = " ";
-            }
-            _caret.textContent = firstChar;
-            _next.textContent = textAfter.slice(1);
-
-            _caret.classList.remove("term-blink");
-            setTimeout(function() {
-                _caret.classList.add("term-blink")
-            }, 1000);
+            _terminal.navigate(_prev.textContent.length+1);
         };
 
         _terminal.skipRight = function() {
-            var textBefore = _prev.textContent;
             var textAfter = _next.textContent;
 
             match = _skipPattern.exec(textAfter);
             if(match) {
                 // if there was a word separation, jump there
                 var newIndex = match.index+1;
-                _prev.textContent = textBefore + _caret.textContent
-                                + textAfter.substring(0, newIndex);
-                _next.textContent = textAfter.substring(newIndex+1);
-                _caret.textContent = textAfter.charAt(newIndex);
+                _terminal.navigate(newIndex);
             } else {
                 // if there was no word separation, perform as if
                 // the home button was pressed
@@ -173,38 +155,14 @@ window.w3term = function(node, options){
         };
 
         _terminal.home = function() {
-            var textBefore = _prev.textContent;
-            var firstChar = _prev.textContent.slice(0, 1);
-            if(firstChar == "") return;
-
-            if(_next.textContent == "") _caret.textContent = "";
-
-            _next.textContent = textBefore.slice(1)
-                             + _caret.textContent
-                             + _next.textContent;
-            _caret.textContent = firstChar;
-            _prev.textContent = "";
-
-            _caret.classList.remove("term-blink");
-            setTimeout(function() {
-                _caret.classList.add("term-blink")
-            }, 1000);
+            _terminal.navigate(0);
         };
 
         _terminal.end = function() {
-            if (_next.textContent == "" && _caret.textContent == " ") return;
-
-            _prev.textContent = _prev.textContent
-                                + _caret.textContent
-                                + _next.textContent;
-
-            _caret.textContent = " ";
-            _next.textContent = "";
-
-            _caret.classList.remove("term-blink");
-            setTimeout(function() {
-                _caret.classList.add("term-blink")
-            }, 1000);
+            _terminal.navigate(_prev.textContent
+                + _caret.textContent.length
+                + _next.textContent.length
+                -1);
         };
 
         _terminal.enter = function() {
