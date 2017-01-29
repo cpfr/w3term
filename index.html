@@ -3,11 +3,7 @@
     <meta charset="utf-8">
     <title>w3term - Javascript Terminal</title>
     <link rel="stylesheet" href="terminal.css" type="text/css"/>
-    <!-- <script src="jquery.js"></script> -->
-    <script
-        src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
-    </script>
-    <script src="terminal.js"></script>
+    <script src="w3term.js"></script>
 
     <style type="text/css">
     body{
@@ -19,13 +15,18 @@
         text-align: justify;
     }
 
-    code
-    {
+    code {
         font-family: monospace;
         font-style: normal;
+        background-color: #222;
     }
 
-    #forkongithub a{
+    pre {
+        padding: 0.5em;
+        background-color: #222;
+    }
+
+    #forkongithub a {
                 width:200px;
                 position:absolute;
                 top:30px;
@@ -100,8 +101,8 @@
             Type <code>clear</code> and it will erase the terminal contents.
         </li>
         <li>
-            Type <code>prompt ></code> to change the prompt symbol to
-            <code>&gt;</code>
+            Type <code>prompt "&gt; "</code> to change the prompt symbol to
+            <code>&gt; </code>
         </li>
         <li>
             Type <code>disable</code> to disable text input for two seconds
@@ -115,13 +116,15 @@
     <ul>
         <li>Text input</li>
         <li>Paste text using CTRL+V</li>
-        <li>TAB indents 4 spaces</li>
-        <li>SHIFT+TAB dedents up to 4 spaces</li>
+        <!-- <li> TODO: TAB completion</li> -->
         <li>HOME / END jump to start / end of line</li>
         <li>Navigation using arrow keys</li>
         <li>
             Quick navigation between words using
             CTRL+LEFT / CTRL+RIGHT
+        </li>
+        <li>
+            ALT+Backspace deletes a whole word.
         </li>
         <li>
             Browsing through command history using UP and DOWN keys
@@ -133,14 +136,14 @@
         </li>
         <li>Compatible with non-keyboard devices.</li>
         <li>
-            Sass preprocessed stylesheets make it easy to customize the
+            Sass-preprocessed stylesheets make it easy to customize the
             terminal layout and appearance.
         </li>
     </ul>
 
-    <h3>Requirements</h3>
+    <h3>Dependencies</h3>
     <ul>
-        <li>Requires JQuery</li>
+        <li>No external dependencies / no 3rd-party libs required</li>
     </ul>
 
     <h3>Tested in:</h3>
@@ -154,20 +157,46 @@
     </ul>
 
     <h1>Documentation</h1>
+    <h2>Usage example</h2>
+    <p>
+        A terminal is created by calling the function <code>w3term</code> with
+        a dom element as an argument (in this case a div).
+        Every element that is not a div is automatically converted into a div.
+    </p>
+    <pre><code>var term = w3term(document.getElementById("myId"),
+    {
+        prompt : "$ ",
+        processCommand : function(cmd) {
+            // implement your command logic here
+        }
+    }
+);
+
+term.w3term.println("Welcome to w3term"); // print some text into the terminal
+</code></pre>
+    <p>
+        The second parameter is an object that contains several options. It is
+        optional and can be omitted if the terminal should be created with
+        default options. A list of possible options is described below.
+    </p>
+
     <h2>Method Summary</h2>
+    <p>
+        The following methods can be called via
+        <code>element.w3term.&lt;methodName&gt;(...)</coode>:
+    </p>
     <ul>
         <li>
-            <code>terminal.init(element, options)</code><br/>
-            Replaces the given element with a terminal.
+            <code>init(node, options)</code><br/>
+            Replaces the given node with a terminal.
             <ul>
                 <li>
-                    <code>element</code><br/>
-                    An element or a selector for the element which should be
-                    converted into a terminal.
+                    <code>node</code><br/>
+                    An element that should be converted into a terminal.
                 </li>
                 <li>
                     <code>options</code> [optional]<br/>
-                    A Javascript object which defines the behavior of the
+                    An object that defines the behavior of the
                     terminal. Possible values are:
                     <ul>
                         <li>
@@ -196,16 +225,11 @@
                     </ul>
                 </li>
             </ul>
-
         </li>
         <li>
-            <code>terminal.setInput(_terminal, text)</code><br/>
+            <code>setInput(text)</code><br/>
             Sets the prompt line of the given terminal to the given text.
             <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
                 <li>
                     <code>text</code><br/>
                     The text which should be set as current line
@@ -213,23 +237,13 @@
             </ul>
         </li>
         <li>
-            <code>terminal.clear(_terminal)</code><br/>
+            <code>clear()</code><br/>
             Clears the contents of the given terminal.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-            </ul>
         </li>
         <li>
-            <code>terminal.println(_terminal, text, escapeHtml)</code><br/>
+            <code>println(text, escapeHtml)</code><br/>
             Prints a line of text into the given terminal.
             <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
                 <li>
                     <code>text</code><br/>
                     The text which should be printed
@@ -243,15 +257,11 @@
             </ul>
         </li>
         <li>
-            <code>terminal.print(_terminal, text, escapeHtml)</code><br/>
+            <code>print(text, escapeHtml)</code><br/>
             Same as <code>println</code>, but does not add a newline character
             at the end of the text.
             <ul>
                 <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-                <li>
                     <code>text</code><br/>
                     The text which should be printed
                 </li>
@@ -264,155 +274,93 @@
             </ul>
         </li>
         <li>
-            <code>terminal.disableInput(_terminal)</code><br/>
+            <code>disableInput()</code><br/>
             Hides the blinking caret and disables user input.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-            </ul>
         </li>
         <li>
-            <code>terminal.enableInput(_terminal)</code><br/>
+            <code>terminal.enableInput()</code><br/>
             Shows the blinking caret and enables user input.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-            </ul>
         </li>
         <li>
-            <code>terminal.scrollDown(_terminal)</code><br/>
+            <code>scrollToBottom()</code><br/>
             Scrolls down to the last line (i.e. the caret) of the terminal.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-            </ul>
-        </li>
-        <li>
-            <code>terminal.setOptionsDefault(_terminal)</code><br/>
-            Sets the terminal options to default.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-            </ul>
-        </li>
-        <li>
-            <code>terminal.setOptions(_terminal, options)</code><br/>
-            Sets the terminal options to the given options.
-            <ul>
-                <li>
-                    <code>_terminal</code><br/>
-                    The terminal element which should be modified
-                </li>
-                <li>
-                    <code>options</code><br/>
-                    A Javascript object which defines the behavior of the
-                    terminal. Possible values are:
-                    <ul>
-                        <li>
-                            <code>prompt</code>:
-                            (string) The prompt symbol
-                            <i>(default=<code>"&gt; "</code>)</i>
-                        </li>
-                        <li>
-                            <code>historySize</code>:
-                            (int) The number of commands which can be stored
-                            within the command history.
-                            <i>(default=<code>100</code>)</i>
-                        </li>
-                        <li>
-                            <code>processCommand</code>:
-                            (function(cmd, term)) A handler function which
-                            receives a command from the terminal and may
-                            process them. The second parameter is optional
-                            and will receive the terminal object which sent
-                            the command.
-                            <i>
-                                (writes the command to the JS console
-                                by default)
-                            </i>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
         </li>
         <!--<li>
             <code>terminal.</code><br/>
         </li>-->
     </ul>
-  </body>
+</body>
 
-  <script type="application/javascript">
-    $(document).ready(function(){
-            var term = terminal.init('#foo',
-            {
-                prompt : '$ ',
-                historySize : 4,
-                processCommand : function(cmd, term){
-                    if(cmd == "clear"){
-                        terminal.clear(term);
-                    }
-                    else if(cmd == 'help'){
-                        terminal.println(term,
-                                       "This terminal does not contain any help files!");
-                    }
-                    else if(cmd == 'colors'){
-                        terminal.print(term,
-                       "This terminal supports different colors and font styles\n"
-                        +"according to the ANSI escape codes:\n"
-                        + " - \x1B[31mred\x1B[0m color\n"
-                        + " - \x1B[32mgreen\x1B[0m color\n"
-                        + " - \x1B[33myellow\x1B[0m color\n"
-                        + " - \x1B[34mblue\x1B[0m color\n"
-                        + " - \x1B[35mmagenta\x1B[0m color\n"
-                        + " - \x1B[36mcyan\x1B[0m color\n"
-                        + " - \x1B[37mwhite\x1B[0m color\n"
-                        + " - \x1B[41mred\x1B[0m background\n"
-                        + " - \x1B[42mgreen\x1B[0m background\n"
-                        + " - \x1B[43myellow\x1B[0m background\n"
-                        + " - \x1B[44mblue\x1B[0m background\n"
-                        + " - \x1B[45mmagenta\x1B[0m background\n"
-                        + " - \x1B[46mcyan\x1B[0m background\n"
-                        + " - \x1B[47mwhite\x1B[0m background\n"
-                        + " - \x1B[1mbold\x1B[0m font\n"
-                        + " - \x1B[3mitalic\x1B[0m font\n"
-                        + " - \x1B[4munderlined\x1B[0m font\n"
-                        + " - \x1B[5mblinking\x1B[0m font\n"
-                        + " - \x1B[7minverted\x1B[0m font\n"
-                        + " - \x1B[92msuccess\x1B[0m highlighting\n"
-                        + " - \x1B[95mheader\x1B[0m highlighting\n"
-                        + " - \x1B[94minfo\x1B[0m highlighting\n"
-                        + " - \x1B[93mwarning\x1B[0m highlighting\n"
-                        + " - \x1B[91merror\x1B[0m highlighting\n"
-                        + "\n"
-                        + "And this works also with "
-                        + "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m\n"
-                       );
-                    }
-                    else if(cmd == 'disable'){
-                        terminal.disableInput(term);
-                        setTimeout(function(){terminal.enableInput(term);},
-                            2000);
-                    }
-                    else if(cmd.substr(0,6) == 'prompt'){
-                        var sym = cmd.split(' ');
-                        sym = sym[sym.length-1];
-                        terminal.setOptions(term, {prompt : sym});
-                    }
-                    else {
-                        console.log('cmd: "'+cmd+'"');
-                    }
+<script type="application/javascript">
+var term = w3term(document.getElementById("foo"),
+    {
+        prompt : '$ ',
+        historySize : 4,
+        processCommand : function(text, args) {
+            if(args[0] == "clear"){
+                term.w3term.clear();
+            }
+            else if(args[0] == 'help') {
+                term.w3term.println(
+                           "This terminal does not contain any help files!");
+            }
+            else if(args[0] == 'colors') {
+                term.w3term.print(
+                    "This terminal supports different colors and font styles\n"
+                    + "according to the ANSI escape codes:\n"
+                    +  " - \x1B[31mred\x1B[0m color\n"
+                    +  " - \x1B[32mgreen\x1B[0m color\n"
+                    +  " - \x1B[33myellow\x1B[0m color\n"
+                    +  " - \x1B[34mblue\x1B[0m color\n"
+                    +  " - \x1B[35mmagenta\x1B[0m color\n"
+                    +  " - \x1B[36mcyan\x1B[0m color\n"
+                    +  " - \x1B[37mwhite\x1B[0m color\n"
+                    +  " - \x1B[41mred\x1B[0m background\n"
+                    +  " - \x1B[42mgreen\x1B[0m background\n"
+                    +  " - \x1B[43myellow\x1B[0m background\n"
+                    +  " - \x1B[44mblue\x1B[0m background\n"
+                    +  " - \x1B[45mmagenta\x1B[0m background\n"
+                    +  " - \x1B[46mcyan\x1B[0m background\n"
+                    +  " - \x1B[47mwhite\x1B[0m background\n"
+                    +  " - \x1B[1mbold\x1B[0m font\n"
+                    +  " - \x1B[3mitalic\x1B[0m font\n"
+                    +  " - \x1B[4munderlined\x1B[0m font\n"
+                    +  " - \x1B[5mblinking\x1B[0m font\n"
+                    +  " - \x1B[7minverted\x1B[0m font\n"
+                    +  " - \x1B[92msuccess\x1B[0m highlighting\n"
+                    +  " - \x1B[95mheader\x1B[0m highlighting\n"
+                    +  " - \x1B[94minfo\x1B[0m highlighting\n"
+                    +  " - \x1B[93mwarning\x1B[0m highlighting\n"
+                    +  " - \x1B[91merror\x1B[0m highlighting\n"
+                    +  "\n"
+                    +  "And this works also with "
+                    +  "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m\n"
+               );
+            }
+            else if(args[0] == 'disable') {
+                term.w3term.disableInput();
+                setTimeout(function() { term.w3term.enableInput(); }, 2000);
+            }
+            else if(args[0] == 'prompt') {
+                if(args.length != 2) {
+                    term.w3term.print(
+                        "the 'prompt' command needs exactly one argument.")
                 }
-            });
+                else {
+                    term.w3term.setOptions({prompt : args[1]});
+                }
+            }
+            else {
+                var output = 'text "' + text + '" parsed as [';
+                output += '"' + args[0] + '"'
+                for(var i = 1; i < args.length; i++) {
+                    output += ', "' + args[i] + '"'
+                }
+                output += "]";
+                console.log(output);
+            }
         }
-    );
-  </script>
-
+    }
+);
+</script>
 </html>
