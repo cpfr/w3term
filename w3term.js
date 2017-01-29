@@ -42,7 +42,7 @@ window.w3term = function(node, options){
         _next = document.createElement("span");
         _caret = document.createElement("span");
         _caret.textContent = " ";
-        _caret.className = "textcursor term-blink";
+        _caret.className = "textcursor w3term-blink";
 
         _currentLine.appendChild(_prompt);
         _currentLine.appendChild(_prev);
@@ -105,9 +105,9 @@ window.w3term = function(node, options){
                 _next.textContent = wholeText.substring(pos+1);
             }
 
-            _caret.classList.remove("term-blink");
+            _caret.classList.remove("w3term-blink");
             setTimeout(function() {
-                _caret.classList.add("term-blink")
+                _caret.classList.add("w3term-blink")
             }, 1000);
         };
 
@@ -481,10 +481,10 @@ window.w3term = function(node, options){
                 tag.style.textDecoration = "underline";
                 break;
             case "\x1B[5m":
-                tag.className = "term-textblink";
+                tag.className = "w3term-textblink";
                 break;
             case "\x1B[7m":
-                tag.className = "term-textinverted";
+                tag.className = "w3term-textinverted";
                 break;
             case "\x1B[92m": // success
                 tag.style.color = "#00EE00";
@@ -556,6 +556,7 @@ window.w3term = function(node, options){
     }
 
     function setOptions(original, newValues) {
+        newValues = newValues || {};
         if(newValues.prompt !== undefined)
             original.prompt = newValues.prompt;
 

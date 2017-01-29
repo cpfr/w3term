@@ -4,7 +4,7 @@ $terminalInactiveColor: darken(desaturate($terminalColor, 50%), 30%);
 $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
 
 
-.terminal, .w3term
+.w3term
 {
     overflow: auto;
     text-align: left;
@@ -59,16 +59,25 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         white-space: pre;
     }
 
-    .term-blink
+    .w3term-blink
     {
-        animation: term-blink 1s step-start 0s infinite;
-        -webkit-animation: term-blink 1s step-start 0s infinite;
+        animation: w3term-blink 1s step-start 0s infinite;
+    }
+    
+    .w3term-textblink {
+        animation: w3term-textblink 1s steps(5, start) infinite;
+        -webkit-animation: w3term-textblink 1s steps(5, start) infinite;
+    }
+
+    .w3term-textinverted{
+        color: $terminalBackgroundColor;
+        background-color: $terminalOutputColor;
     }
 }
 
 
 
-@keyframes term-blink {
+@keyframes w3term-blink {
     0%
     {
         background-color: $terminalColor;
@@ -83,40 +92,9 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         color: $terminalBackgroundColor;
     }
 }
-@-webkit-keyframes term-blink {
-    0%
-    {
-        background-color: $terminalColor;
-        color: $terminalBackgroundColor;
-    }
-    50% {
-        background-color: transparent;
-        color: $terminalColor;
-    }
-    100% {
-        background-color: $terminalColor;
-        color: $terminalBackgroundColor;
-    }
-}
 
-
-
-.term-textblink {
-    animation: term-textblink 1s steps(5, start) infinite;
-    -webkit-animation: term-textblink 1s steps(5, start) infinite;
-}
-@keyframes term-textblink {
+@keyframes w3term-textblink {
     to {
         visibility: hidden;
     }
-}
-@-webkit-keyframes term-textblink {
-    to {
-        visibility: hidden;
-    }
-}
-
-.term-textinverted{
-    color: $terminalBackgroundColor;
-    background-color: $terminalOutputColor;
 }
