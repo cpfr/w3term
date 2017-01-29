@@ -121,6 +121,7 @@ window.w3term = function(node, options){
             if(textBefore == "") return;
 
             var matches = [];
+            _skipPattern.lastIndex = 0; // reset regex
             while((match = _skipPattern.exec(textBefore.slice(0, -1))) != null) {
                 matches.push(match.index);
             }
@@ -142,10 +143,11 @@ window.w3term = function(node, options){
         _terminal.skipRight = function() {
             var textAfter = _next.textContent;
 
+            _skipPattern.lastIndex = 0; // reset regex
             match = _skipPattern.exec(textAfter);
             if(match) {
                 // if there was a word separation, jump there
-                var newIndex = match.index+2;
+                var newIndex = _prev.textContent.length + match.index + 2;
                 _terminal.navigate(newIndex);
             } else {
                 // if there was no word separation, perform as if

@@ -296,7 +296,7 @@ var term = w3term(document.getElementById("foo"),
     {
         prompt : '$ ',
         historySize : 4,
-        processCommand : function(cmd, args) {
+        processCommand : function(text, args) {
             if(args[0] == "clear"){
                 term.w3term.clear();
             }
@@ -351,7 +351,13 @@ var term = w3term(document.getElementById("foo"),
                 }
             }
             else {
-                console.log('cmd: "' + cmd + '"');
+                var output = 'text "' + text + '" parsed as [';
+                output += '"' + args[0] + '"'
+                for(var i = 1; i < args.length; i++) {
+                    output += ', "' + args[i] + '"'
+                }
+                output += "]";
+                console.log(output);
             }
         }
     }
