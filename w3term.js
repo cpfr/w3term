@@ -28,7 +28,7 @@ window.w3term = function(node, options){
         var _caret;
         var _next;
         // ---------------------------------------------------------------------
-        setOptions(_terminal, options);
+        setOptions(_terminal, _options, options);
 
         _node.className += " w3term";
         _hiddenInput = document.createElement("input");
@@ -279,7 +279,7 @@ window.w3term = function(node, options){
         };
 
         _terminal.setOptions = function (options) {
-            setOptions(_options, options);
+            setOptions(_terminal, _options, options);
         };
 
         _terminal.setStylePrefix = function(stylePrefix) {
