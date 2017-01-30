@@ -1,0 +1,47 @@
+.bnw
+{
+    background-color: black;
+    color: white;
+}
+
+.bnw .bnw-textinverted{
+    color: black;
+    background-color: #eeeeee; /* output color */
+}
+
+.bnw p
+{
+    color: #eeeeee;
+}
+
+.bnw .output
+{
+    color: #cdcdcd;
+}
+
+.bnw .textcursor
+{
+    background-color: white;
+    color: black;
+}
+
+.bnw .bnw-blink
+{
+    animation: bnw-blink 1s step-start 0s infinite;
+}
+
+@keyframes bnw-blink {
+    0%
+    {
+        background-color: white;
+        color: black;
+    }
+    50% {
+        background-color: transparent;
+        color: white;
+    }
+    100% {
+        background-color: white;
+        color: black;
+    }
+}

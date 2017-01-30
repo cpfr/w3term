@@ -7,7 +7,7 @@ window.w3term = function(node, options){
             prompt : "> ",
             historySize : 100,
             stylePrefix : "",
-            processCommand : function(string, args) {
+            processCommand : function(terminal, string, args) {
                 console.log(string, args);
             }
         };
@@ -208,7 +208,8 @@ window.w3term = function(node, options){
                 _commandStep = _commandHistory.length;
 
                 // process command
-                _options.processCommand(wholeText, parseBashArgs(wholeText));
+                _options.processCommand(_terminal, wholeText,
+                    parseBashArgs(wholeText));
             }
             _prompt.textContent = _options.prompt;
             _terminal.scrollToBottom();
@@ -410,6 +411,127 @@ window.w3term = function(node, options){
             }
         };
         // ---------------------------------------------------------------------
+
+        function processColors(text){
+            var rootTag = document.createElement("span");
+            var currentTag = rootTag;
+
+            var i = text.indexOf("\x1B[");
+            while(i >= 0) {
+                currentTag.appendChild(
+                    document.createTextNode(text.substr(0, i)));
+
+                // add a new command or reset font?
+                if(text.substr(i, 4) == "\x1B[0m"){ // reset
+                    currentTag = rootTag;
+                    colorCode = "\x1B[0m";
+                }
+                else {
+                    colorCode = text.substr(i, 5);
+                    if(colorCode.charAt(3) == "m") {
+                        colorCode = colorCode.substr(0, 4);
+                    }
+                    var newTag = getColorTag(colorCode);
+                    currentTag.appendChild(newTag);
+                    currentTag = newTag;
+                }
+                // replace the code by the new tag
+                text = text.substr(i + colorCode.length);
+                i = text.indexOf("\x1B[");
+            }
+            currentTag.appendChild(document.createTextNode(text));
+            return rootTag;
+        }
+
+        function getColorTag(colorCode) {
+            var tag = document.createElement("span");
+            switch(colorCode){
+                case "\x1B[31m":
+                    tag.style.color = "red";
+                    break;
+                case "\x1B[32m":
+                    tag.style.color = "green";
+                    break;
+                case "\x1B[33m":
+                    tag.style.color = "yellow";
+                    break;
+                case "\x1B[34m":
+                    tag.style.color = "blue";
+                    break;
+                case "\x1B[35m":
+                    tag.style.color = "magenta";
+                    break;
+                case "\x1B[36m":
+                    tag.style.color = "cyan";
+                    break;
+                case "\x1B[37m":
+                    tag.style.color = "white";
+                    break;
+                case "\x1B[41m":
+                    tag.style.backgroundColor = "red";
+                    break;
+                case "\x1B[42m":
+                    tag.style.backgroundColor = "green";
+                    break;
+                case "\x1B[43m":
+                    tag.style.backgroundColor = "yellow";
+                    break;
+                case "\x1B[44m":
+                    tag.style.backgroundColor = "blue";
+                    break;
+                case "\x1B[45m":
+                    tag.style.backgroundColor = "magenta";
+                    break;
+                case "\x1B[46m":
+                    tag.style.backgroundColor = "cyan";
+                    break;
+                case "\x1B[47m":
+                    tag.style.backgroundColor = "white";
+                    break;
+                case "\x1B[1m":
+                    tag.style.fontWeight = "bold";
+                    break;
+                case "\x1B[3m":
+                    tag.style.fontStyle = "italic";
+                    break;
+                case "\x1B[4m":
+                    tag.style.textDecoration = "underline";
+                    break;
+                case "\x1B[5m":
+                    // tag.className = "w3term-textblink";
+                    for(var i = 0; i < _tagClassBlinkNames.length; i++) {
+                        console.log(_tagClassBlinkNames[i]);
+                        tag.classList.add(_tagClassBlinkNames[i]);
+                    }
+                    break;
+                case "\x1B[7m":
+                    // tag.className = "w3term-textinverted";
+                    for(var i = 0; i < _tagClassInvertedNames.length; i++) {
+                        tag.classList.add(_tagClassInvertedNames[i]);
+                    }
+                    break;
+                case "\x1B[92m": // success
+                    tag.style.color = "#00EE00";
+                    break;
+                case "\x1B[95m": // header
+                    tag.style.color = "#660099";
+                    break;
+                case "\x1B[94m": // info
+                    tag.style.color = "#3399FF";
+                    break;
+                case "\x1B[93m": // warning
+                    tag.style.color = "#FF9900";
+                    break;
+                case "\x1B[91m": // error
+                    tag.style.color = "#990000";
+                    break;
+                default:
+                    break;
+            }
+            return tag;
+        }
+
+        // ---------------------------------------------------------------------
         if(options && options.stylePrefix) {
             _terminal.setStylePrefix(options.stylePrefix);
         }
@@ -438,123 +560,6 @@ window.w3term = function(node, options){
         while(node.firstChild){
             node.removeChild(node.firstChild);
         }
-    }
-
-    function processColors(text){
-        var rootTag = document.createElement("span");
-        var currentTag = rootTag;
-
-        var i = text.indexOf("\x1B[");
-        while(i >= 0) {
-            currentTag.appendChild(document.createTextNode(text.substr(0, i)));
-
-            // add a new command or reset font?
-            if(text.substr(i, 4) == "\x1B[0m"){ // reset
-                currentTag = rootTag;
-                colorCode = "\x1B[0m";
-            }
-            else {
-                colorCode = text.substr(i, 5);
-                if(colorCode.charAt(3) == "m") {
-                    colorCode = colorCode.substr(0, 4);
-                }
-                var newTag = getColorTag(colorCode);
-                currentTag.appendChild(newTag);
-                currentTag = newTag;
-            }
-            // replace the code by the new tag
-            text = text.substr(i + colorCode.length);
-            i = text.indexOf("\x1B[");
-        }
-        currentTag.appendChild(document.createTextNode(text));
-        return rootTag;
-    }
-
-    function getColorTag(colorCode) {
-        var tag = document.createElement("span");
-        switch(colorCode){
-            case "\x1B[31m":
-                tag.style.color = "red";
-                break;
-            case "\x1B[32m":
-                tag.style.color = "green";
-                break;
-            case "\x1B[33m":
-                tag.style.color = "yellow";
-                break;
-            case "\x1B[34m":
-                tag.style.color = "blue";
-                break;
-            case "\x1B[35m":
-                tag.style.color = "magenta";
-                break;
-            case "\x1B[36m":
-                tag.style.color = "cyan";
-                break;
-            case "\x1B[37m":
-                tag.style.color = "white";
-                break;
-            case "\x1B[41m":
-                tag.style.backgroundColor = "red";
-                break;
-            case "\x1B[42m":
-                tag.style.backgroundColor = "green";
-                break;
-            case "\x1B[43m":
-                tag.style.backgroundColor = "yellow";
-                break;
-            case "\x1B[44m":
-                tag.style.backgroundColor = "blue";
-                break;
-            case "\x1B[45m":
-                tag.style.backgroundColor = "magenta";
-                break;
-            case "\x1B[46m":
-                tag.style.backgroundColor = "cyan";
-                break;
-            case "\x1B[47m":
-                tag.style.backgroundColor = "white";
-                break;
-            case "\x1B[1m":
-                tag.style.fontWeight = "bold";
-                break;
-            case "\x1B[3m":
-                tag.style.fontStyle = "italic";
-                break;
-            case "\x1B[4m":
-                tag.style.textDecoration = "underline";
-                break;
-            case "\x1B[5m":
-                // tag.className = "w3term-textblink";
-                for(var i = 0; i < _tagClassBlinkNames; i++) {
-                    tag.classList.add(_tagClassBlinkNames[i]);
-                }
-                break;
-            case "\x1B[7m":
-                // tag.className = "w3term-textinverted";
-                for(var i = 0; i < _tagClassInvertedNames; i++) {
-                    tag.classList.add(_tagClassInvertedNames[i]);
-                }
-                break;
-            case "\x1B[92m": // success
-                tag.style.color = "#00EE00";
-                break;
-            case "\x1B[95m": // header
-                tag.style.color = "#660099";
-                break;
-            case "\x1B[94m": // info
-                tag.style.color = "#3399FF";
-                break;
-            case "\x1B[93m": // warning
-                tag.style.color = "#FF9900";
-                break;
-            case "\x1B[91m": // error
-                tag.style.color = "#990000";
-                break;
-            default:
-                break;
-        }
-        return tag;
     }
 
     function parseBashArg(char, cmdString, i) {

@@ -3,75 +3,135 @@
     <meta charset="utf-8">
     <title>w3term - Styling Examples</title>
     <link rel="stylesheet" href="w3term.css" type="text/css"/>
+    <link rel="stylesheet" href="styles/gradient.css" type="text/css"/>
+    <link rel="stylesheet" href="styles/bgimage.css" type="text/css"/>
+    <link rel="stylesheet" href="styles/gray.css" type="text/css"/>
+    <link rel="stylesheet" href="styles/bnw.css" type="text/css"/>
     <script src="w3term.js"></script>
+    <style type="text/css">
+    body{
+        max-width: 800px;
+    }
+    </style>
   </head>
   <body>
     <h1>w3term - Styling Examples</h1>
+    <p>
+        The w3term library is designed to be easily adaptable to your needs.
+        For using the terminal in your web application, you only need to
+        reference two files in your html file:
+        <code>w3term.js</code> and <code>w3term.css</code>.
+        The css file contains important stylesheets for the terminal to work
+        like a real console.
+    </p>
+    <p>
+        However, you might want to change the look and feel of your terminal.
+        In order to make this as easy as possible, this page shows you some
+        examples of how to do that. The following terminals are created using
+        an option named <code>stylePrefix</code>, which will cause the terminal
+        to be created using css classes with a certain naming scheme.
+        Using that naming scheme, you can easily override the default styles
+        of the terminal:
+    </p>
+
+    <h3>Blue Gradient</h3>
+    <p>
+        With a slight text-shadow
+        (see <a href="styles/gradient.css">gradient.css</a>)
+    </p>
     <div id="t1"></div>
-    <br/>
-    <style type="text/css">
-    .w4term
-    {
-        border: 1px solid black;
-        background-color: #dedede;
-        color: #111111;
-    }
 
-    .w4term-textinverted{
-        color: #dedede;
-        background-color: #333333; /* output color */
-    }
-
-    .w4term p
-    {
-        color: #555555;
-    }
-
-    .w4term .output
-    {
-        color: #333333;
-    }
-
-    .w4term .textcursor
-    {
-        background-color: #111111;
-        color: #dedede;
-    }
-
-    .w4term .w4term-blink
-    {
-        animation: w4term-blink 1s step-start 0s infinite;
-    }
-
-    @keyframes w4term-blink {
-        0%
-        {
-            background-color: #111111;
-            color: #dedede;
-        }
-        50% {
-            background-color: transparent;
-            color: #111111;
-        }
-        100% {
-            background-color: #111111;
-            color: #dedede;
-        }
-    }
-    </style>
+    <h3>Background Image</h3>
+    <p>
+        With a slight text-shadow, inset box-shadow, round corners
+        and a custom font.
+        (see <a href="styles/bgimage.css">bgimage.css</a>)
+    </p>
     <div id="t2"></div>
-    <br/>
+
+    <h3>Gray</h3>
+    <p>
+        (see <a href="styles/gray.css">gray.css</a>)
+    </p>
     <div id="t3"></div>
-    <br/>
+
+    <h3>Black and White</h3>
+    <p>
+        (see <a href="styles/bnw.css">bnw.css</a>)
+    </p>
     <div id="t4"></div>
+
+
+    <h3>Default Nerdy Green-ish</h3>
+    <p>
+        (without any additional stylesheet)
+    </p>
+    <div id="t5"></div>
   </body>
   <script type="application/javascript">
-  var t1 = w3term(document.getElementById("t1"));
+
+  function onCommand(terminal, text, args) {
+      console.log(terminal);
+      if(args[0] == "colors") {
+          terminal.print(
+              "This terminal supports different colors and font styles\n"
+              + "according to the ANSI escape codes:\n"
+              +  " - \x1B[31mred\x1B[0m color\n"
+              +  " - \x1B[32mgreen\x1B[0m color\n"
+              +  " - \x1B[33myellow\x1B[0m color\n"
+              +  " - \x1B[34mblue\x1B[0m color\n"
+              +  " - \x1B[35mmagenta\x1B[0m color\n"
+              +  " - \x1B[36mcyan\x1B[0m color\n"
+              +  " - \x1B[37mwhite\x1B[0m color\n"
+              +  " - \x1B[41mred\x1B[0m background\n"
+              +  " - \x1B[42mgreen\x1B[0m background\n"
+              +  " - \x1B[43myellow\x1B[0m background\n"
+              +  " - \x1B[44mblue\x1B[0m background\n"
+              +  " - \x1B[45mmagenta\x1B[0m background\n"
+              +  " - \x1B[46mcyan\x1B[0m background\n"
+              +  " - \x1B[47mwhite\x1B[0m background\n"
+              +  " - \x1B[1mbold\x1B[0m font\n"
+              +  " - \x1B[3mitalic\x1B[0m font\n"
+              +  " - \x1B[4munderlined\x1B[0m font\n"
+              +  " - \x1B[5mblinking\x1B[0m font\n"
+              +  " - \x1B[7minverted\x1B[0m font\n"
+              +  " - \x1B[92msuccess\x1B[0m highlighting\n"
+              +  " - \x1B[95mheader\x1B[0m highlighting\n"
+              +  " - \x1B[94minfo\x1B[0m highlighting\n"
+              +  " - \x1B[93mwarning\x1B[0m highlighting\n"
+              +  " - \x1B[91merror\x1B[0m highlighting\n"
+              +  "\n"
+              +  "And this works also with "
+              +  "\x1B[31m\x1B[5m\x1B[4mmultiple styles at once\x1B[0m\n"
+         );
+     }
+  }
+
+  var t1 = w3term(document.getElementById("t1"),
+  {
+      processCommand : onCommand,
+      stylePrefix : "gradient"
+  });
   var t2 = w3term(document.getElementById("t2"),
   {
-      stylePrefix : "w4term"
+      processCommand : onCommand,
+      stylePrefix : "bgimage"
   });
-  var t3 = w3term(document.getElementById("t3"));
-  var t4 = w3term(document.getElementById("t4"));
+  var t3 = w3term(document.getElementById("t3"),
+  {
+      processCommand : onCommand,
+      stylePrefix : "gray"
+  });
+  var t4 = w3term(document.getElementById("t4"),
+  {
+      processCommand : onCommand,
+      stylePrefix : "bnw"
+  });
+  var t5 = w3term(document.getElementById("t5"),
+  {
+      processCommand : onCommand
+  });
+
+  window.scrollTo(0, 0);
   </script>
 </html>

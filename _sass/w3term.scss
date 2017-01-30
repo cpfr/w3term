@@ -15,6 +15,7 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
     height: 300px;
     font-weight: 400;
     font-size: 12px;
+    box-sizing: border-box;
 
     input.hiddenInput{
         opacity: 0;
@@ -63,7 +64,7 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
     {
         animation: w3term-blink 1s step-start 0s infinite;
     }
-    
+
     .w3term-textblink {
         animation: w3term-textblink 1s steps(5, start) infinite;
         -webkit-animation: w3term-textblink 1s steps(5, start) infinite;

@@ -296,7 +296,7 @@ var term = w3term(document.getElementById("foo"),
     {
         prompt : '$ ',
         historySize : 4,
-        processCommand : function(text, args) {
+        processCommand : function(termainal, text, args) {
             if(args[0] == "clear"){
                 term.w3term.clear();
             }
