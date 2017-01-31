@@ -3,9 +3,9 @@ w3term
 
 Javascript Web Terminal
 -----------------------
-This terminal is intended to support the emulation of an interactive shell like many scripting languages or the operating systems themselves provide. 
+This terminal is intended to support the emulation of an interactive shell like many scripting languages or the operating systems themselves provide.
 
-[Live Demo](http://htmlpreview.github.io/?https://github.com/tuschcarsten/w3term/blob/master/index.html)
+[Live Demo](http://cpfr.github.io/w3term/)
 
 Features
 --------
@@ -106,7 +106,7 @@ Method Summary
 
     - ``_terminal``<br/>
       The terminal element which should be modified
-      
+
     - ``options``<br/>
       A Javascript object which defines the behavior of the
       terminal. Possible values are:
