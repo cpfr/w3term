@@ -1,0 +1,48 @@
+.gray
+{
+    border: 1px solid black;
+    background-color: #dedede;
+    color: #111111;
+}
+
+.gray .gray-textinverted{
+    color: #dedede;
+    background-color: #333333; /* output color */
+}
+
+.gray p
+{
+    color: #555555;
+}
+
+.gray .output
+{
+    color: #333333;
+}
+
+.gray .textcursor
+{
+    background-color: #111111;
+    color: #dedede;
+}
+
+.gray .gray-blink
+{
+    animation: gray-blink 1s step-start 0s infinite;
+}
+
+@keyframes gray-blink {
+    0%
+    {
+        background-color: #111111;
+        color: #dedede;
+    }
+    50% {
+        background-color: transparent;
+        color: #111111;
+    }
+    100% {
+        background-color: #111111;
+        color: #dedede;
+    }
+}

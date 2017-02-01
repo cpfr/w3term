@@ -1,0 +1,57 @@
+.gradient
+{
+    border: 1px solid #093794;
+    background: linear-gradient(to bottom, #2957c4 0%,#7db9e8 100%);
+    color: #ffffff;
+    text-shadow: 1px 1px 2px black;
+    padding: 0.5em;
+}
+
+.gradient .gradient-textinverted{
+    color: #4B6FC1;
+    background-color: #ffffff; /* output color */
+}
+
+.gradient .withBackground {
+    text-shadow: none;
+}
+
+.gradient p
+{
+    color: #efefef;
+}
+
+.gradient .output
+{
+    color: #d0d0d0;
+}
+
+.gradient .textcursor
+{
+    background-color: #ffffff;
+    color: #4B6FC1;
+    box-shadow: 1px 1px 2px black;
+    text-shadow: none;
+}
+
+.gradient .gradient-blink
+{
+    animation: gradient-blink 1s step-start 0s infinite;
+}
+
+@keyframes gradient-blink {
+    0%
+    {
+        background-color: #ffffff;
+        color: #4B6FC1;
+    }
+    50% {
+        box-shadow: none;
+        background-color: transparent;
+        color: #ffffff;
+    }
+    100% {
+        background-color: #ffffff;
+        color: #4B6FC1;
+    }
+}
