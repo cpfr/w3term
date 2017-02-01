@@ -9,17 +9,18 @@ This terminal is intended to support the emulation of an interactive shell like 
 
 Features
 --------
+
 - Text input
 - Paste text using CTRL+V
-- TAB indents 4 spaces
-- SHIFT+TAB dedents up to 4 spaces
 - HOME / END jump to start / end of line
 - Navigation using arrow keys
 - Quick navigation between words using CTRL+LEFT / CTRL+RIGHT
+- ALT+Backspace deletes a whole word.
 - Browsing through command history using UP and DOWN keys
 - Commiting commands using RETURN
 - Bind a callback function which evaluates the commands and implements behavior.
-- Compatible with non-keyboard devices
+- Compatible with non-keyboard devices.
+- Sass-preprocessed stylesheets make it easy to customize the terminal layout and appearance.
 
 Requirements
 ------------
