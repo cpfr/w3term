@@ -7,9 +7,13 @@
     padding: 0.5em;
 }
 
-.w3term .gradient-textinverted{
+.gradient .gradient-textinverted{
     color: #4B6FC1;
     background-color: #ffffff; /* output color */
+}
+
+.gradient .withBackground {
+    text-shadow: none;
 }
 
 .gradient p

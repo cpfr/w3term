@@ -24,6 +24,10 @@
     font-size: 16px;
 }
 
+.bgimage .withBackground {
+    text-shadow: none;
+}
+
 .bgimage .bgimage-textinverted{
     color: #3d3d3d;
     background-color: #17a1d4; /* output color */

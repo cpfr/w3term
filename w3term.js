@@ -469,24 +469,31 @@ window.w3term = function(node, options){
                     break;
                 case "\x1B[41m":
                     tag.style.backgroundColor = "red";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[42m":
                     tag.style.backgroundColor = "green";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[43m":
                     tag.style.backgroundColor = "yellow";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[44m":
                     tag.style.backgroundColor = "blue";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[45m":
                     tag.style.backgroundColor = "magenta";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[46m":
                     tag.style.backgroundColor = "cyan";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[47m":
                     tag.style.backgroundColor = "white";
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[1m":
                     tag.style.fontWeight = "bold";
@@ -509,6 +516,7 @@ window.w3term = function(node, options){
                     for(var i = 0; i < _tagClassInvertedNames.length; i++) {
                         tag.classList.add(_tagClassInvertedNames[i]);
                     }
+                    tag.classList.add("withBackground");
                     break;
                 case "\x1B[92m": // success
                     tag.style.color = "#00EE00";
