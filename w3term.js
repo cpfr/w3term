@@ -64,6 +64,7 @@ window.w3term = function(node, options){
 
         _terminal.skipBackspace = function() {
             var matches = [];
+            _skipPattern.lastIndex = 0; // reset regex
             while((match = _skipPattern.exec(
                 _prev.textContent.slice(0, -1))) != null)
             {
