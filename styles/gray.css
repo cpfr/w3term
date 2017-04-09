@@ -26,6 +26,15 @@
     color: #dedede;
 }
 
+.gray.nofocus .textcursor
+{
+    background-color: #dedede;
+    color: #111111;
+    border: 1px solid #111111;
+    animation: none;
+}
+
+
 .gray .gray-blink
 {
     animation: gray-blink 1s step-start 0s infinite;

@@ -25,6 +25,14 @@
     color: black;
 }
 
+.bnw.nofocus .textcursor
+{
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    animation: none;
+}
+
 .bnw .bnw-blink
 {
     animation: bnw-blink 1s step-start 0s infinite;

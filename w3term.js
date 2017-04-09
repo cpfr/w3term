@@ -35,6 +35,14 @@ window.w3term = function(node, options){
         _hiddenInput.type = "text";
         _hiddenInput.className = "hiddenInput";
 
+        _hiddenInput.onfocus = function() {
+            _node.classList.remove("nofocus");
+        }
+
+        _hiddenInput.onblur = function() {
+            _node.classList.add("nofocus");
+        }
+
         _currentLine = document.createElement("span");
         _currentLine.className = "currentLine";
         _currentLine.tabindex = 0;
