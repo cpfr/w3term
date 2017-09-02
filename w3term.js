@@ -252,7 +252,9 @@ window.w3term = function(node, options){
             var textNode = processColors(text);
 
             var outputElement = _currentLine.previousSibling;
-            if(outputElement.classList.contains("output")) {
+            if(outputElement != null &&
+                outputElement.classList.contains("output"))
+            {
                 outputElement.appendChild(textNode);
             }
             else {
