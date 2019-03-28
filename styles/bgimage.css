@@ -45,10 +45,18 @@
 
 .bgimage .textcursor
 {
-    background-color: #111111;
-    color: #dedede;
+    background-color: #27c1f4;
+    color: #3d3d3d;
     box-shadow: 1px 1px 2px black;
     text-shadow: none;
+}
+
+.bgimage.nofocus .textcursor
+{
+    background-color: transparent;
+    color: #27c1f4;
+    border: 1px solid #27c1f4;
+    animation: none;
 }
 
 .bgimage .bgimage-blink

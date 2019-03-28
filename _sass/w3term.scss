@@ -57,6 +57,7 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
         background-color: $terminalColor;
         color: $terminalBackgroundColor;
         white-space: pre;
+        box-sizing: border-box;
     }
 
     .w3term-blink
@@ -72,6 +73,14 @@ $terminalOutputColor: desaturate($terminalInactiveColor, 50%);
     .w3term-textinverted{
         color: $terminalBackgroundColor;
         background-color: $terminalOutputColor;
+    }
+
+    &.nofocus .textcursor
+    {
+        background-color: $terminalBackgroundColor;
+        color: $terminalColor;
+        border: 1px solid $terminalColor;
+        animation: none;
     }
 }
 
